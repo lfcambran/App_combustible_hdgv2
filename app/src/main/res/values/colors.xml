@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparencia">#08000000</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="primary_app">#0c293f</color>
+    <color name="botones">#61ACFB</color>
+    <color name="segundario">#0830F4</color>
+    <color name="Colorgree">#3fa748</color>
+    <color name="colorazul">#0c6ddc</color>
+    <color name="Gris">#CBD7E4</color>
+    <color name="rojo">#ED050D</color>
+    <color name="Rojo_advertencia">#B30505</color>
+</resources>

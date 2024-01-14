@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/linearLayoutCompat"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@color/colorazul"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DOCUMENTOS EMITIDOS"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:textSize="12sp" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rango de Fecha"
+            android:textColor="@color/white"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="De:"
+                android:textColor="@color/white"/>
+            <EditText
+                android:id="@+id/fechainicial"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ems="10"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/white"
+                android:enabled="false"/>
+            <ImageButton
+                android:id="@+id/btfechai"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/baseline_calendar_month_24"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/white"
+                android:text="Al:"/>
+            <EditText
+                android:id="@+id/fechafinal"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/white"
+                android:enabled="false"/>
+            <ImageButton
+                android:id="@+id/btfechaf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/baseline_calendar_month_24"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btconsultar"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:text="Consultar"
+                android:backgroundTint="@color/Colorgree"
+                />
+
+        </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <ListView
+        android:id="@+id/lv_doc"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="10.0sp"
+        android:scrollbars="vertical"
+        android:layout_marginTop="150dp"
+        tools:listitem="@layout/list_vales"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

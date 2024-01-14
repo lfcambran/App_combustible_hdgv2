@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">HDGC Venta Combustible</string>
+    <string name="title_activity">HDGC Vales</string>
+    <string name="prompt_usuario">Usuario</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Inciar Sesion</string>
+    <string name="action_sign_in_short">nombre de usuario corto</string>
+    <string name="welcome">"Bienvenido !"</string>
+    <string name="invalid_username">Invalido nombre de usuario</string>
+    <string name="invalid_password">contraseña >5 caracteres</string>
+    <string name="login_failed">"Inicio de Sesion Fallido"</string>
+    <string name="title_activity_main">Principal</string>
+    <string name="channel_name">App de Combustible</string>
+    <string name="channel_name_session">Inicio de Sesion</string>
+    <string name="channel_description_session">Se ha Iniciado la sesion correctamente</string>
+    <string name="channel_description">Venta y consumo de Combustible HDG</string>
+    <string name="aboutapp">Es una Aplicacion Movil (android) bajo licencia concedida a Helicopteros de Guatemala. App Destinada para la creacion de vales de
+    combustible. el cual se crean y se grabaran de manera automatica en oficinas centrales, separados segun sea la sucursal.
+    y obteniendo un registro de existencias por base y sucursal</string>
+    <string name="external_dir" />
+</resources>
