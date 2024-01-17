@@ -73,13 +73,13 @@ import com.app_combustible_hdgv2.utilidades.tipo_movimiento;
 
 public class activity_emitir_vale extends AppCompatActivity   {
     int codigom,tmov,noerror;
-    private AppBarConfiguration appBarConfiguration;
+    Boolean correo_valido;
     private SoapObject resultRequestSOAP = null;
     public static final int SIGNATURE_ACTIVITY = 1;
     final int REQUEST_ACTION_CAMERA = 9;
     final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
     final String NAMESPACES = "http://tempuri.org/";
-    EditText fecha_vale,codigo_producto,preciogalon,totalvale,cantidad_venta,npiloto;
+    EditText fecha_vale,codigo_producto,preciogalon,totalvale,cantidad_venta,npiloto,correo_cliente;
     DatePickerDialog picker;
     Button boton_grabar,boton_limpiar,boton_tomar_foto;
     TextView nameuser,existencia,metrot,nombre_producto;
@@ -113,6 +113,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         fecha_vale.setInputType(InputType.TYPE_NULL);
         fecha_vale.setText(fecha);
         npiloto=findViewById(R.id.nombrepiloto);
+        correo_cliente=findViewById(R.id.correo_cliente);
         nameuser=findViewById(R.id.nauser);
         listasucursales=findViewById(R.id.sucursal);
         lmatriculas=findViewById(R.id.matriculas);
@@ -264,6 +265,22 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
             }
         });
+        correo_cliente.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                correo_valido=validar_correo(correo_cliente.getText().toString());
+            }
+        });
         cantidad_venta.addTextChangedListener(new TextWatcher(){
 
             @Override
@@ -299,7 +316,16 @@ public class activity_emitir_vale extends AppCompatActivity   {
             }
         });
     }
-
+    private boolean validar_correo(String correo)
+    {
+        String emailRegex ="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        if(correo.matches(emailRegex))
+        {
+            return true;
+        }else {
+        return false;
+        }
+    }
     public void grabar_vale(View View){
         try {
             SoapPrimitive resultRequestSOAP = null;
@@ -310,6 +336,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
             String nombrepioto =npiloto.getText().toString();
             String precio_g = preciogalon.getText().toString();
             String cantidad_v = cantidad_venta .getText().toString();
+            String copia_correo_cliente = correo_cliente.getText().toString();
 
             SoapObject respuesta = new SoapObject(NAMESPACES,METHOD_NAME);
             MarshalDouble md = new MarshalDouble();
@@ -337,6 +364,11 @@ public class activity_emitir_vale extends AppCompatActivity   {
                 respuesta.addProperty("longitud",longitud);
                 respuesta.addProperty("latitud",latitud);
                 respuesta.addProperty("fotografia",fotografia);
+                if (copia_correo_cliente.length()>0) {
+                    respuesta.addProperty("correo_cliente", copia_correo_cliente);
+                }else if (copia_correo_cliente.length()==0){
+                    respuesta.addProperty("correo_cliente","Sin Correo");
+                }
                 envelope.setOutputSoapObject(respuesta);
 
                 HttpTransportSE transportSE = new HttpTransportSE(URL);
@@ -414,6 +446,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         String nombrepiloto = npiloto.getText().toString();
         String precio_g = preciogalon.getText().toString();
         String cantidad_v = cantidad_venta .getText().toString();
+        String CorreoCliente = correo_cliente.getText().toString();
 
         if (precio_g.length()==0 || precio_g==null ){
             precio=0;
@@ -424,6 +457,13 @@ public class activity_emitir_vale extends AppCompatActivity   {
             cantidad=0;
         }else {
              cantidad=Float.parseFloat(cantidad_v);
+        }
+
+        if (CorreoCliente.length()>0){
+            if (correo_valido==false){
+                mensaje_error=mensaje_error + " El Correo del cliente es incorrecto" + "\n";
+                noerror +=1;
+            }
         }
 
         if (binding.signatureView.isBitmapEmpty()){

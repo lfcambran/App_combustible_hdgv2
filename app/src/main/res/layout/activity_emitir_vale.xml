@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="15dp"
+    android:paddingTop="10dp"
     tools:context=".activity_emitir_vale">
     <ScrollView
         android:layout_width="match_parent"
@@ -144,7 +144,7 @@
         </LinearLayout>
         <LinearLayout
             android:gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -337,15 +337,23 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:gravity="center"
                 android:layout_marginTop="10dp"
             >
+            <EditText
+                android:id="@+id/correo_cliente"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Correo Cliente (opcional)"/>
             <Button
                 android:id="@+id/grabar"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:layout_marginTop="10dp"
                 android:backgroundTint="@color/botones"
                 android:gravity="center"
                 android:text="Grabar"
