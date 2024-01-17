@@ -31,7 +31,9 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -279,6 +281,20 @@ public class activity_emitir_vale extends AppCompatActivity   {
             @Override
             public void afterTextChanged(Editable s) {
                 correo_valido=validar_correo(correo_cliente.getText().toString());
+
+            }
+        });
+        correo_cliente.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    correo_valido=validar_correo(correo_cliente.getText().toString());
+                    HideKeyboard(correo_cliente);
+                    return true;
+                }
+                return false;
             }
         });
         cantidad_venta.addTextChangedListener(new TextWatcher(){
@@ -315,6 +331,11 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
             }
         });
+
+    }
+    private void HideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
     private boolean validar_correo(String correo)
     {
