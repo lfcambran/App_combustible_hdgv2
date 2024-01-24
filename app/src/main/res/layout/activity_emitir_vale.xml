@@ -11,9 +11,9 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
         android:fillViewport="true"
         android:scrollbars="vertical"
+        android:scrollbarStyle="insideInset"
         tools:ignore="MissingConstraints">
 
         <LinearLayout
@@ -25,39 +25,34 @@
             tools:ignore="MissingConstraints"
             >
 
-            <TextView
-                android:id="@+id/twtitulo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Formulario Ingreso"
-                android:textStyle="bold" />
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="38dp"
                 android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                    android:layout_marginTop="10dp"
                     android:text="Fecha:"
-                    android:layout_marginTop="15dp"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                     app:layout_constraintBottom_toTopOf="@+id/date_field"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <EditText
                     android:id="@+id/fecha_vale"
                     android:layout_width="163dp"
-                    android:layout_height="48dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="-5dp"
+                    android:ems="10"
                     android:gravity="center"
                     android:hint="Fecha"
-                    android:ems="10"
                     android:importantForAutofill="no"
                     app:layout_constraintBottom_toTopOf="@+id/guideline"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
+
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline"
                     android:layout_width="wrap_content"
@@ -143,37 +138,41 @@
                 </LinearLayout>
 
             </LinearLayout>
+
             <LinearLayout
-                android:gravity="center"
-                android:layout_marginTop="1dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
+                android:layout_marginTop="1dp"
+                android:gravity="center"
                 android:orientation="horizontal">
+
                 <TextView
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Producto:"
-                    />
+                    android:text="Producto:" />
+
                 <EditText
                     android:id="@+id/cproducto"
                     android:layout_width="80dp"
-                    android:enabled="true"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="-5dp"
+                    android:enabled="true" />
+
                 <TextView
                     android:id="@+id/nombreproducto"
-                    android:text="Nombre Producto"
-                    android:gravity="left"
-                    android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="left"
+                    android:text="Nombre Producto" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="5dp">
                 <TextView
                     android:layout_width="108dp"
                     android:layout_height="wrap_content"
@@ -235,10 +234,11 @@
 
                 <EditText
                     android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
                     android:id="@+id/total_vale"
                     android:hint="0"
+                    android:layout_marginBottom="-5dp"
                     android:gravity="center"
                     />
 
@@ -246,7 +246,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -321,17 +321,18 @@
                     android:id="@+id/tomar_foto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
                     android:text="Tomar Foto" />
 
                 <Button
                     android:id="@+id/limpiarf"
-                    android:layout_width="match_parent"
+                    android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tomar_foto"
                     android:layout_alignStart="@id/tomar_foto"
                     android:layout_alignLeft="@id/tomar_foto"
-                    android:layout_gravity="left"
+                    android:layout_gravity="center"
                     android:layout_marginLeft="100dp"
                     android:layout_toLeftOf="@id/tomar_foto"
                     android:text="Limpiar Firma" />
@@ -344,6 +345,11 @@
                 android:gravity="center"
                 android:layout_marginTop="10dp"
                 >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Correo Cliente"
+                    android:layout_gravity="left"/>
                 <EditText
                     android:id="@+id/correo_cliente"
                     android:layout_marginLeft="10dp"
@@ -351,14 +357,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:hint="Correo Cliente (opcional)"/>
+                    android:hint="(opcional)"/>
                 <Button
                     android:id="@+id/grabar"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/botones"
+                    android:backgroundTint="@color/segundario"
                     android:gravity="center"
                     android:text="Grabar"
                     android:onClick="grabar_vale"

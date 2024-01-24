@@ -4,6 +4,7 @@ package com.app_combustible_hdgv2;
 import android.app.DatePickerDialog;
 import android.app.LauncherActivity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -63,7 +64,7 @@ protected void onCreate(Bundle savedInstancesState) {
     super.onCreate(savedInstancesState);
     setTitle("Documentos Emitidos por Fecha");
     setContentView(R.layout.activity_lista_vales);
-
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     adaptador_docemitidos=new ArrayList<String>();
     lv=(ListView)findViewById(R.id.lv_doc);
     fecha_inicial=(EditText) findViewById(R.id.fechainicial);

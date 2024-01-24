@@ -12,6 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,6 +25,9 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.Environment;
+import android.app.ProgressDialog;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputType;
@@ -93,6 +97,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
     private Uri photoURI;
     Bitmap foto_tanque;
     varibles_globales gb;
+    ProgressDialog progressDoalog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,6 +143,9 @@ public class activity_emitir_vale extends AppCompatActivity   {
         longitud=gb.getlongitu();
         latitud=gb.getlatitud();
 
+        if (codigo_sucursal==1){
+            boton_tomar_foto.setEnabled(false);
+        }
         binding.limpiarf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -348,89 +357,136 @@ public class activity_emitir_vale extends AppCompatActivity   {
         }
     }
     public void grabar_vale(View View){
-        try {
-            SoapPrimitive resultRequestSOAP = null;
-            String SOAP_ACTION = "http://tempuri.org/insertar_vale";
-            String METHOD_NAME = "insertar_vale";
-            Bitmap signBitmap = binding.signatureView.getSignatureBitmap();
-            String fechavale = fecha_vale.getText().toString();
-            String nombrepioto =npiloto.getText().toString();
-            String precio_g = preciogalon.getText().toString();
-            String cantidad_v = cantidad_venta .getText().toString();
-            String copia_correo_cliente = correo_cliente.getText().toString();
 
-            SoapObject respuesta = new SoapObject(NAMESPACES,METHOD_NAME);
-            MarshalDouble md = new MarshalDouble();
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            md.register(envelope);
-            envelope.dotNet = true;
-            envelope.implicitTypes=true;
-            envelope.encodingStyle = SoapSerializationEnvelope.XSD;
             if(validar_datos()==true){
-                String byte_str=convertir_imagen_byte(signBitmap);
-                String fotografia =convertir_imagen_byte(foto_tanque);
-                respuesta.addProperty( "tipom",tmov);
-                respuesta.addProperty("codsucursal",codigo_sucursal);
-                respuesta.addProperty("matricula",codigom );
-                respuesta.addProperty("despachador",codigo_empleado);
-                respuesta.addProperty("fecha", fechavale );
-                respuesta.addProperty("usuario", uname);
-                respuesta.addProperty("piloto",nombrepioto);
-                respuesta.addProperty("ctransaccion", codigotransaccion);
-                respuesta.addProperty("producto",codigoproducto);
-                respuesta.addProperty("cantidad", cantidad_v );
-                respuesta.addProperty("valor", precio_g);
-                respuesta.addProperty("notanque",codigo_tanque_select);
-                respuesta.addProperty("img_firma",byte_str);
-                respuesta.addProperty("longitud",longitud);
-                respuesta.addProperty("latitud",latitud);
-                respuesta.addProperty("fotografia",fotografia);
-                if (copia_correo_cliente.length()>0) {
-                    respuesta.addProperty("correo_cliente", copia_correo_cliente);
-                }else if (copia_correo_cliente.length()==0){
-                    respuesta.addProperty("correo_cliente","Sin Correo");
-                }
-                envelope.setOutputSoapObject(respuesta);
 
-                HttpTransportSE transportSE = new HttpTransportSE(URL);
-                transportSE.call(SOAP_ACTION,envelope);
-                resultRequestSOAP =(SoapPrimitive) envelope.getResponse();
-                String res_insert = resultRequestSOAP.toString();
-                String respuet = res_insert.toString();
+                barrar_progreso();
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setIcon(R.drawable.iconapp);
-                if (respuet.equals("ok")){
-                    builder.setTitle("Documento De Combustible");
-                    builder.setMessage("Se ha Generado el vale correctamente");
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent intent = new Intent(activity_emitir_vale.this,MainActivity.class);
-                            intent.putExtra("nombre_usuario",uname);
-                            startActivity(intent);
-                            setResult(Activity.RESULT_OK);
+                                SoapPrimitive resultRequestSOAP = null;
+                                String SOAP_ACTION = "http://tempuri.org/insertar_vale";
+                                String METHOD_NAME = "insertar_vale";
+                                Bitmap signBitmap = binding.signatureView.getSignatureBitmap();
+                                String fechavale = fecha_vale.getText().toString();
+                                String nombrepioto =npiloto.getText().toString();
+                                String precio_g = preciogalon.getText().toString();
+                                String cantidad_v = cantidad_venta .getText().toString();
+                                String copia_correo_cliente = correo_cliente.getText().toString();
+
+
+                                SoapObject respuesta = new SoapObject(NAMESPACES,METHOD_NAME);
+                                MarshalDouble md = new MarshalDouble();
+                                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                                md.register(envelope);
+                                envelope.dotNet = true;
+                                envelope.implicitTypes=true;
+                                envelope.encodingStyle = SoapSerializationEnvelope.XSD;
+                                String fotografia;
+
+                                String byte_str=convertir_imagen_byte(signBitmap);
+                                if (codigo_sucursal!=1){
+                                    fotografia=convertir_imagen_byte(foto_tanque);
+                                }else {
+                                    fotografia = "";
+                                }
+
+                                respuesta.addProperty( "tipom",tmov);
+                                respuesta.addProperty("codsucursal",codigo_sucursal);
+                                respuesta.addProperty("matricula",codigom );
+                                respuesta.addProperty("despachador",codigo_empleado);
+                                respuesta.addProperty("fecha", fechavale );
+                                respuesta.addProperty("usuario", uname);
+                                respuesta.addProperty("piloto",nombrepioto);
+                                respuesta.addProperty("ctransaccion", codigotransaccion);
+                                respuesta.addProperty("producto",codigoproducto);
+                                respuesta.addProperty("cantidad", cantidad_v );
+                                respuesta.addProperty("valor", precio_g);
+                                respuesta.addProperty("notanque",codigo_tanque_select);
+                                respuesta.addProperty("img_firma",byte_str);
+                                respuesta.addProperty("longitud",longitud);
+                                respuesta.addProperty("latitud",latitud);
+                                if (codigo_sucursal==1){
+                                    respuesta.addProperty("fotografia","Sin Imagen");
+                                }else {
+                                    respuesta.addProperty("fotografia", fotografia);
+                                }
+                                if (copia_correo_cliente.length()>0) {
+                                    respuesta.addProperty("correo_cliente", copia_correo_cliente);
+                                }else if (copia_correo_cliente.length()==0){
+                                    respuesta.addProperty("correo_cliente","Sin Correo");
+                                }
+                                envelope.setOutputSoapObject(respuesta);
+
+                                HttpTransportSE transportSE = new HttpTransportSE(URL);
+                                transportSE.call(SOAP_ACTION,envelope);
+                                resultRequestSOAP =(SoapPrimitive) envelope.getResponse();
+
+                                String res_insert = resultRequestSOAP.toString();
+                                String respuet = res_insert.toString();
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(activity_emitir_vale.this);
+                                builder.setCancelable(false);
+                                builder.setIcon(R.drawable.iconapp);
+
+                                if (respuet.equals("ok")){
+                                    progressDoalog.dismiss();
+                                    runOnUiThread(new Thread(){
+                                        public void run(){
+                                            builder.setTitle("Documento De Combustible");
+                                            builder.setMessage("Se ha Generado el vale correctamente");
+                                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    Intent intent = new Intent(activity_emitir_vale.this,MainActivity.class);
+                                                    intent.putExtra("nombre_usuario",uname);
+                                                    startActivity(intent);
+                                                    setResult(Activity.RESULT_OK);
+                                                }
+                                            });
+                                            AlertDialog alertDialog =builder.create();
+                                            alertDialog.show();
+                                            alertDialog.getWindow().setGravity(Gravity.CENTER);
+                                        }
+                                    });
+
+
+                                }else{
+                                    progressDoalog.dismiss();
+                                    runOnUiThread(new Thread(){
+                                        public void run(){
+                                            builder.setTitle("Error al Emitir Vales");
+                                            builder.setMessage("Error: " + respuet);
+                                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    Intent intent = new Intent(activity_emitir_vale.this,MainActivity.class);
+                                                    intent.putExtra("nombre_usuario",uname);
+                                                    startActivity(intent);
+                                                    setResult(Activity.RESULT_OK);
+                                                    Toast.makeText(getApplicationContext(), "Error: " + respuet.toString(), Toast.LENGTH_LONG).show();
+
+                                                }
+                                            });
+                                            AlertDialog alertDialog =builder.create();
+                                            alertDialog.show();
+                                            alertDialog.getWindow().setGravity(Gravity.CENTER);
+                                        }
+                                    });
+
+                                }
+                                ///
+                            }catch (IOException e) {
+                                Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                            }catch (XmlPullParserException c){
+                                Toast.makeText(getApplicationContext(),c.getMessage(),Toast.LENGTH_LONG).show();
+                            }
+                            }
                         }
-                    });
-                    AlertDialog alertDialog =builder.create();
-                    alertDialog.show();
-                    alertDialog.getWindow().setGravity(Gravity.CENTER);
-
-                }else{
-                    builder.setTitle("Error al Emitir Vales");
-                    builder.setMessage("Error: " + respuet);
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Toast.makeText(getApplicationContext(), "Error: " + respuet.toString(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    AlertDialog alertDialog =builder.create();
-                    alertDialog.show();
-                    alertDialog.getWindow().setGravity(Gravity.CENTER);
-
-
-                }
+                ).start();
 
 
             }else{
@@ -449,14 +505,46 @@ public class activity_emitir_vale extends AppCompatActivity   {
                 alertDialog.getWindow().setGravity(Gravity.CENTER);
 
             }
-        }catch (IOException e) {
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
-        }catch (XmlPullParserException c){
-            Toast.makeText(getApplicationContext(),c.getMessage(),Toast.LENGTH_LONG).show();
-        }
+
 
 
     }
+
+    private void barrar_progreso(){
+
+        progressDoalog=new ProgressDialog(activity_emitir_vale.this);
+        progressDoalog.setMax(100);
+        progressDoalog.setIcon(R.drawable.iconapp);
+        progressDoalog.setIndeterminate(true);
+        progressDoalog.setMessage("Procesando");
+        progressDoalog.setTitle("Generando Documento");
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (progressDoalog.getProgress() <= progressDoalog.getMax()) {
+                        Thread.sleep(200);
+                        handle.sendMessage(handle.obtainMessage());
+                        if (progressDoalog.getProgress() == progressDoalog.getMax()) {
+                            progressDoalog.dismiss();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        progressDoalog.show();
+    }
+    Handler handle = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            progressDoalog.incrementProgressBy(1);
+        }
+    };
 
     private boolean validar_datos(){
         float cantidad;
@@ -491,9 +579,11 @@ public class activity_emitir_vale extends AppCompatActivity   {
             mensaje_error=mensaje_error + " El documento no se encuentra firmado" + "\n";
             noerror+=1;
         }
-        if (foto_tanque==null){
-            mensaje_error=mensaje_error + " No se encontro ninguna foto de tanque" + "\n";
-            noerror+=1;
+        if (codigo_sucursal!=1){
+            if (foto_tanque==null){
+                mensaje_error=mensaje_error + " No se encontro ninguna foto de tanque" + "\n";
+                noerror+=1;
+            }
         }
 
         if (codigoproducto.length()==0){
@@ -512,6 +602,10 @@ public class activity_emitir_vale extends AppCompatActivity   {
              mensaje_error = mensaje_error + " La cantidad de venta no puede ser cero" + "\n";
              noerror+=1;
          }
+        if (codigom==-1){
+            mensaje_error = mensaje_error + " Debe de seleccionar una matricula" + "\n";
+            noerror+=1;
+        }
 
          if (noerror==0) {
              return true;
@@ -663,7 +757,7 @@ private void llenar_matriculas(){
             ArrayAdapter<lista_matriculas> lm = new ArrayAdapter<lista_matriculas>(this, android.R.layout.simple_spinner_dropdown_item,listam);
             lmatriculas.setAdapter(lm);
             lmatriculas.setPrompt("Seleccionar Matricula");
-
+            lmatriculas.setSelection(-1);
         }catch (IOException e){
             e.printStackTrace();
         }catch (XmlPullParserException e){
@@ -675,6 +769,11 @@ private void llenar_matriculas(){
         Toast.makeText(this, "Seleccion " + sucursales.getCodigo_sucursal() + " " + sucursales.toString(),Toast.LENGTH_LONG).show();
         codigo_sucursal=sucursales.getCodigo_sucursal();
         llenar_tanques(codigo_sucursal);
+        if (codigo_sucursal==1){
+            boton_tomar_foto.setEnabled(false);
+        }else {
+            boton_tomar_foto.setEnabled(true);
+        }
     }
 
     public void SeleccionOnClick_tanque(View v){
