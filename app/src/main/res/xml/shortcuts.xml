@@ -1,0 +1,16 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcuts
+        android:shortcutId="compose"
+        android:enabled="true"
+        android:icon="@drawable/iconapp"
+        android:shortcutShortLabel="@string/compose_shortcut_info"
+        android:shortcutLongLabel="@string/compose_shortcut_info_l">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.app_combustible_hdgv2"
+            android:targetClass="com.app_combustible_hdgv2.ui.login.LoginActivity"
+        />
+        <categories android:name="android.shurtcut.Productivity"/>
+
+    </shortcuts>
+</shortcuts>

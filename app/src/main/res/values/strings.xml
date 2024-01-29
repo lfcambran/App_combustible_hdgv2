@@ -18,4 +18,7 @@
     combustible. el cual se crean y se grabaran de manera automatica en oficinas centrales, separados segun sea la sucursal.
     y obteniendo un registro de existencias por base y sucursal</string>
     <string name="external_dir" />
+    <string name="compose_shortcut_info">Aplicacion para la generacion de documento de combustible HDGC</string>
+    <string name="compose_shortcut_info_l">Aplicacion generada para HDGC. para la emision y transferencia de docuemento
+    electronico de combustible </string>
 </resources>

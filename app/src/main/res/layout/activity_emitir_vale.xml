@@ -155,9 +155,10 @@
                 <EditText
                     android:id="@+id/cproducto"
                     android:layout_width="80dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginBottom="-5dp"
-                    android:enabled="true" />
+                    android:enabled="true"
+                    android:inputType="numberDecimal" />
 
                 <TextView
                     android:id="@+id/nombreproducto"
@@ -189,12 +190,11 @@
 
             <LinearLayout
                 android:gravity="center"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
-
                     android:layout_width="48dp"
                     android:layout_height="wrap_content"
                     android:text="Precio:"/>
@@ -202,6 +202,7 @@
                     android:id="@+id/precio"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
+                    android:enabled="false"
                     android:inputType="numberDecimal"/>
                 <TextView
                     android:layout_marginLeft="10dp"
@@ -222,7 +223,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal"
                 >
 
@@ -230,6 +231,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="18dp"
+
                     android:text="Total Vale:"/>
 
                 <EditText
@@ -238,6 +240,7 @@
                     android:inputType="numberDecimal"
                     android:id="@+id/total_vale"
                     android:hint="0"
+                    android:enabled="false"
                     android:layout_marginBottom="-5dp"
                     android:gravity="center"
                     />
@@ -340,37 +343,38 @@
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 >
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Correo Cliente"
-                    android:layout_gravity="left"/>
+                    android:layout_gravity="center"
+                    android:text="Correo Cliente:" />
+
                 <EditText
                     android:id="@+id/correo_cliente"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:hint="(opcional)"/>
-                <Button
-                    android:id="@+id/grabar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/segundario"
-                    android:gravity="center"
-                    android:text="Grabar"
-                    android:onClick="grabar_vale"
-                    />
-            </LinearLayout>
+                    android:layout_marginLeft="10dp"
+                    android:hint="(opcional)"
+                    android:inputType="textEmailAddress" />
 
+            </LinearLayout>
+            <Button
+                android:id="@+id/grabar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/segundario"
+                android:gravity="center"
+                android:text="Grabar"
+                android:onClick="grabar_vale"
+                />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

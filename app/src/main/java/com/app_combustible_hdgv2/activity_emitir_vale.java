@@ -142,6 +142,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         nameuser.setText("Nombre: " + codigo_empleado + " - " + nombre_usuario);
         longitud=gb.getlongitu();
         latitud=gb.getlatitud();
+        cantidad_venta.setEnabled(false);
 
         if (codigo_sucursal==1){
             boton_tomar_foto.setEnabled(false);
@@ -310,6 +311,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String cantidadv = cantidad_venta.getText().toString();
+
 
             }
 
@@ -322,6 +325,14 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
                 if (!cantidad.isEmpty()){
                     double totalventa;
+                    int cadena_valor = cantidad.length();
+
+                    if (cadena_valor==2){
+                        if (cantidad.charAt(0) == '0') {
+                            cantidad_venta.setText(cantidad.substring(1));
+                            cantidad_venta.setSelection(1, 1);
+                        }
+                    }
 
                     totalventa=Double.valueOf(cantidad) * Double.valueOf(precio);
                     totalvale.setText(String.valueOf(format.format(totalventa)));
@@ -331,6 +342,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
                     existencia.setText("Existencia: " + String.valueOf(format.format(et)));
                 } else {
                     cantidad_venta.setText(String.valueOf(0));
+                    int c = cantidad_venta .getText().length();
+                    cantidad_venta.setSelection(c,c);
 
                 }
             }
@@ -516,7 +529,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         progressDoalog.setMax(100);
         progressDoalog.setIcon(R.drawable.iconapp);
         progressDoalog.setIndeterminate(true);
-        progressDoalog.setMessage("Procesando");
+        progressDoalog.setMessage("Procesando.. por favor espere");
         progressDoalog.setTitle("Generando Documento");
 
 
@@ -983,7 +996,9 @@ private void llenar_matriculas(){
             precio_galon=Double.parseDouble(resultadaSoap.toString());
 
             preciogalon.setText(String.valueOf(precio_galon));
-
+            if (precio_galon != 0){
+                cantidad_venta.setEnabled(true);
+            }
         }catch (IOException e){
             e.printStackTrace();
         }catch (XmlPullParserException e){
