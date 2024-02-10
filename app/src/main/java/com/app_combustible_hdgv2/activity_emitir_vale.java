@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.viewmodel.CreationExtras;
 import androidx.navigation.ui.AppBarConfiguration;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -36,6 +37,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -43,6 +45,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,6 +102,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
     varibles_globales gb;
     ProgressDialog progressDoalog;
 
+    ScrollView scrollView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +116,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
         String fecha = dateFormat.format(date);
         setTitle("Emision de Vale");
         setContentView(binding.getRoot());
+        scrollView= (ScrollView) findViewById(R.id.sview);
+        scrollView.requestDisallowInterceptTouchEvent(true);
         uname=getIntent().getStringExtra("nombre_usuario");
         boton_grabar= (Button) findViewById(R.id.grabar);
         boton_limpiar = (Button) findViewById(R.id.limpiarf);
@@ -129,6 +136,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         existencia=findViewById(R.id.existencia);
         metrot=findViewById(R.id.metrotanque);
         tipomovimiento=findViewById(R.id.tipomovimiento);
+        llenar_tipomovimiento();
         consultar_codigo_producto();
         nombre_producto=findViewById(R.id.nombreproducto);
         codigo_producto=findViewById(R.id.cproducto);
@@ -137,14 +145,13 @@ public class activity_emitir_vale extends AppCompatActivity   {
         buscar_nombre_producto(codigoproducto);
         consultar_datos(uname);
         llenar_matriculas();
-        llenar_tipomovimiento();
         generar_codigo_transaccion();
         nameuser.setText("Nombre: " + codigo_empleado + " - " + nombre_usuario);
         longitud=gb.getlongitu();
         latitud=gb.getlatitud();
         cantidad_venta.setEnabled(false);
 
-        if (codigo_sucursal==1){
+        if (codigo_sucursal==1 || codigo_sucursal==5 ){
             boton_tomar_foto.setEnabled(false);
         }
         binding.limpiarf.setOnClickListener(new View.OnClickListener() {
@@ -188,6 +195,34 @@ public class activity_emitir_vale extends AppCompatActivity   {
             }
         });
 
+        binding.signatureView.setOnTouchListener(new View.OnTouchListener(){
+
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+
+                        scrollView.requestDisallowInterceptTouchEvent(true);
+
+                        return false;
+
+                    case MotionEvent.ACTION_UP:
+
+                        scrollView.requestDisallowInterceptTouchEvent(false);
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        scrollView.requestDisallowInterceptTouchEvent(true);
+                        return false;
+
+                    default:
+                        return true;
+                }
+            }
+        });
         fecha_vale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -401,10 +436,11 @@ public class activity_emitir_vale extends AppCompatActivity   {
                                 String fotografia;
 
                                 String byte_str=convertir_imagen_byte(signBitmap);
-                                if (codigo_sucursal!=1){
-                                    fotografia=convertir_imagen_byte(foto_tanque);
-                                }else {
+                                if (codigo_sucursal==1 || codigo_sucursal==5 ){
                                     fotografia = "";
+                                }else {
+                                    fotografia=convertir_imagen_byte(foto_tanque);
+
                                 }
 
                                 respuesta.addProperty( "tipom",tmov);
@@ -422,7 +458,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
                                 respuesta.addProperty("img_firma",byte_str);
                                 respuesta.addProperty("longitud",longitud);
                                 respuesta.addProperty("latitud",latitud);
-                                if (codigo_sucursal==1){
+
+                                if (codigo_sucursal==1 || codigo_sucursal==5){
                                     respuesta.addProperty("fotografia","Sin Imagen");
                                 }else {
                                     respuesta.addProperty("fotografia", fotografia);
@@ -531,6 +568,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         progressDoalog.setIndeterminate(true);
         progressDoalog.setMessage("Procesando.. por favor espere");
         progressDoalog.setTitle("Generando Documento");
+        progressDoalog.setCancelable(false);
 
 
         new Thread(new Runnable() {
@@ -592,7 +630,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
             mensaje_error=mensaje_error + " El documento no se encuentra firmado" + "\n";
             noerror+=1;
         }
-        if (codigo_sucursal!=1){
+        if (codigo_sucursal!=1 && codigo_sucursal!=5 ){
             if (foto_tanque==null){
                 mensaje_error=mensaje_error + " No se encontro ninguna foto de tanque" + "\n";
                 noerror+=1;
@@ -782,7 +820,7 @@ private void llenar_matriculas(){
         Toast.makeText(this, "Seleccion " + sucursales.getCodigo_sucursal() + " " + sucursales.toString(),Toast.LENGTH_LONG).show();
         codigo_sucursal=sucursales.getCodigo_sucursal();
         llenar_tanques(codigo_sucursal);
-        if (codigo_sucursal==1){
+        if (codigo_sucursal==1 || codigo_sucursal==5 ){
             boton_tomar_foto.setEnabled(false);
         }else {
             boton_tomar_foto.setEnabled(true);
@@ -1000,9 +1038,9 @@ private void llenar_matriculas(){
                 cantidad_venta.setEnabled(true);
             }
         }catch (IOException e){
-            e.printStackTrace();
+            Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
         }catch (XmlPullParserException e){
-            e.printStackTrace();
+            Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
         }
     }
     public void llenar_tanques(int codigosucursal ){
@@ -1107,4 +1145,4 @@ private void llenar_matriculas(){
 
     }
 
-}
+ }  
