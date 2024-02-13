@@ -18,6 +18,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -42,6 +43,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +64,9 @@ import com.app_combustible_hdgv2.utilidades.varibles_globales;
 import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
+
     private final AppCompatActivity activity = this;
     private LoginViewModel loginViewModel;
     private ActivityLoginBinding binding;
@@ -69,12 +74,17 @@ public class LoginActivity extends AppCompatActivity {
     private varibles_globales ug;
     final String NAMESPACES = "http://tempuri.org/";
     final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
-
+    String llave = "session";
+    String clave_user = "";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ug = new varibles_globales();
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
+
+        preferences = this.getPreferences(Context.MODE_PRIVATE);
+        editor = preferences.edit();
+
         setContentView(binding.getRoot());
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
@@ -91,6 +101,12 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginButton = binding.login;
         final ProgressBar loadingProgressBar = binding.loading;
         final TextView localizacionText= binding.localizacion;
+        final Switch guardarsession = binding.recordarUser;
+
+        if (revisar_check()){
+            guardarsession.setChecked(true);
+            usernameEditText.setText(this.preferences.getString(clave_user,""));
+        }
 
         binding.localizacion.setText("Latitud:" + ug.getlatitud() + " Longitud: " + ug.getlongitu() );
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
@@ -157,6 +173,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                guardarsesion(guardarsession.isChecked());
                 SoapPrimitive resultRequestSOAP = null;
                 final String SOAP_ACTION = "http://tempuri.org/Usuario";
                 final String METHOD_NAME = "Usuario";
@@ -183,6 +200,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         Toast.makeText(getApplicationContext(), "Inicio de Sesion Correcto", Toast.LENGTH_LONG).show();
                         Intent accountsIntent = new Intent(activity, MainActivity.class);
+                        guardar_usuario(usernameEditText.getText().toString());
                         accountsIntent.putExtra("nombre_usuario", usernameEditText.getText().toString().trim());
                         startActivity(accountsIntent);
                         setResult(Activity.RESULT_OK);
@@ -344,6 +362,17 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         }
+    }
+    private  boolean revisar_check(){
+        return this.preferences.getBoolean(llave,false);
+    }
+    private void guardarsesion(boolean checked){
+        editor.putBoolean(llave,checked);
+        editor.apply();
+    }
+    private void guardar_usuario(String usuario){
+        editor.putString(clave_user,usuario);
+        editor.apply();
     }
 
 }

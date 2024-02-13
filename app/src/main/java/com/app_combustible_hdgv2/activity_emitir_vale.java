@@ -831,8 +831,10 @@ private void llenar_matriculas(){
         lista_tanque_sucursal tanques = (lista_tanque_sucursal) ltanques.getSelectedItem();
         Toast.makeText(this, "tanque " + tanques.getCodigo_tanque() + " " + tanques.toString(),Toast.LENGTH_LONG).show();
         codigo_tanque_select=tanques.getCodigo_tanque();
+
         buscar_existencia(codigo_tanque_select);
         buscar_metro(codigo_tanque_select);
+        buscar_codigo_producto(codigo_tanque_select);
         //buscar metro-existencia
     }
     public void SeleccionOnClick_matricula(View v){
@@ -937,6 +939,38 @@ private void llenar_matriculas(){
             t.call(SOAP_ACTION,env);
             rs=(SoapPrimitive) env.getResponse();
             nombre_producto.setText(rs.toString());
+        }catch (IOException e){
+            Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
+        }catch (XmlPullParserException e){
+            Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
+        }
+    }
+    public void  buscar_codigo_producto(int codtanque){
+        SoapPrimitive resultado = null;
+        final String SOAP_Action = "http://tempuri.org/codigo_producto_tanque_sel";
+        final String Method_name = "codigo_producto_tanque_sel";
+        int codigo_producto_tanque=0;
+        SoapObject respuesta_codigo_p= new SoapObject(NAMESPACES,Method_name);
+        MarshalDouble md =  new MarshalDouble();
+        SoapSerializationEnvelope env=new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        md.register(env);
+        env.dotNet=true;
+        env.implicitTypes=true;
+        env.encodingStyle=SoapSerializationEnvelope.XSD;
+        respuesta_codigo_p.addProperty("codigo_tanque",codtanque);
+        env.setOutputSoapObject(respuesta_codigo_p);
+        HttpTransportSE transportSE=new HttpTransportSE(URL);
+        try{
+            transportSE.call(SOAP_Action,env);
+            resultado = (SoapPrimitive) env.getResponse();
+            codigo_producto_tanque=Integer.parseInt(resultado.toString());
+            if (codigo_producto_tanque==0){
+                codigo_producto.setText(String.valueOf(codigoproducto));
+                buscar_nombre_producto(codigoproducto);
+            } else {
+            codigo_producto.setText(String.valueOf(codigo_producto_tanque));
+            buscar_nombre_producto(codigo_producto_tanque);
+            }
         }catch (IOException e){
             Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
         }catch (XmlPullParserException e){
