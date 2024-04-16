@@ -92,7 +92,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
     DatePickerDialog picker;
     Button boton_grabar,boton_limpiar,boton_tomar_foto;
     TextView nameuser,existencia,metrot,nombre_producto;
-    String uname,codigotransaccion,mensaje_error,nombre_usuario = null,mCurrentPhotoPath;;
+    String uname,codigotransaccion,mensaje_error,nombre_usuario = null,mCurrentPhotoPath,matricula;
     Spinner listasucursales,lmatriculas,ltanques,tipomovimiento;
     int codigo_sucursal,codigo_empleado,codigo_tanque_select,codigoproducto;
     double existencia_tanque,metro_tanque, longitud,latitud;;
@@ -275,6 +275,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
              Object i=parent.getItemAtPosition(position);
+             matricula = lmatriculas.getSelectedItem().toString();
              if (i!=null){
                  SeleccionOnClick_matricula(view);
              }
@@ -303,7 +304,9 @@ public class activity_emitir_vale extends AppCompatActivity   {
             @Override
             public void afterTextChanged(Editable editable) {
                 try {
-                    consultar_precio_combustible(Integer.parseInt(codigo_producto.getText().toString()),codigom,codigo_sucursal,codigo_tanque_select,tmov);
+                    if (codigom>0) {
+                        consultar_precio_combustible(Integer.parseInt(codigo_producto.getText().toString()), codigom, codigo_sucursal, codigo_tanque_select, tmov);
+                    }
                 } catch (Exception e){
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     e.printStackTrace();
@@ -408,7 +411,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
         .setIcon(R.drawable.iconapp)
         .setTitle("Creacion de Documento")
-        .setMessage("Desea Crear el documento?")
+        .setMessage("Se Creará el documento a la matricula: " + matricula + " con la cantidad de: " + cantidad_venta.getText() + " galones \n Desea Continuar?" )
         .setCancelable(false)
         .setPositiveButton("Si", new DialogInterface.OnClickListener() {
             @Override
@@ -874,37 +877,38 @@ private void llenar_matriculas(){
         env.setOutputSoapObject(rtm);
         HttpTransportSE transportSE = new HttpTransportSE(URL);
         try {
-            transportSE.call(SOAP_ACTION, env);
-            rs = (SoapPrimitive) env.getResponse();
-            tipo=Integer.parseInt(rs.toString());
-            preciogalon.setText("0");
-            if (tipo==0){
-                tipomovimiento.setSelection(1);
-                consultar_precio_combustible(codigoproducto,codigom,codigo_sucursal,codigo_tanque_select,1);
-            }else if(tipo==1){
-                tipomovimiento.setSelection(2);
-            }
+            if (codigom>0) {
+                transportSE.call(SOAP_ACTION, env);
+                rs = (SoapPrimitive) env.getResponse();
+                tipo = Integer.parseInt(rs.toString());
+                preciogalon.setText("0");
+                if (tipo == 0) {
+                    tipomovimiento.setSelection(1);
+                    consultar_precio_combustible(codigoproducto, codigom, codigo_sucursal, codigo_tanque_select, 1);
+                } else if (tipo == 1) {
+                    tipomovimiento.setSelection(2);
+                }
 
-            tipomovimiento.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    Object test = tipomovimiento.getSelectedItem();
-                    Toast.makeText(activity_emitir_vale.this,
-                            tipomovimiento.getItemAtPosition(i).toString(), Toast.LENGTH_LONG).show();
-                    tipo_movimiento tm=(tipo_movimiento) test;
-                        tmov=tm.getCodigomovimiento();
+                tipomovimiento.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        Object test = tipomovimiento.getSelectedItem();
+                        Toast.makeText(activity_emitir_vale.this,
+                                tipomovimiento.getItemAtPosition(i).toString(), Toast.LENGTH_LONG).show();
+                        tipo_movimiento tm = (tipo_movimiento) test;
+                        tmov = tm.getCodigomovimiento();
 
-                    if (codigo_tanque_select!=0) {
-                        consultar_precio_combustible(codigoproducto, codigom, codigo_sucursal, codigo_tanque_select, tmov);
+                        if (codigo_tanque_select != 0) {
+                            consultar_precio_combustible(codigoproducto, codigom, codigo_sucursal, codigo_tanque_select, tmov);
+                        }
                     }
-                }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
 
-                }
-            });
-
+                    }
+                });
+            }
         }catch (IOException e){
             Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
         }catch (XmlPullParserException e){
