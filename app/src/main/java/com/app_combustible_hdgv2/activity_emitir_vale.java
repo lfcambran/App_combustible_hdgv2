@@ -405,15 +405,35 @@ public class activity_emitir_vale extends AppCompatActivity   {
         }
     }
     public void grabar_vale(View View){
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        .setIcon(R.drawable.iconapp)
+        .setTitle("Creacion de Documento")
+        .setMessage("Desea Crear el documento?")
+        .setCancelable(false)
+        .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                creacion_vale();
+            }
+        })
+          .setNegativeButton("No", new DialogInterface.OnClickListener(){
 
-            if(validar_datos()==true){
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+                  Toast.makeText(getApplicationContext(),"Accion Cancelada", Toast.LENGTH_LONG).show();
+              }
+          })
+                .show();
+    }
 
-                barrar_progreso();
-                new Thread(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
+    private void creacion_vale(){
+        if(validar_datos()==true){
+            barrar_progreso();
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
 
                                 SoapPrimitive resultRequestSOAP = null;
                                 String SOAP_ACTION = "http://tempuri.org/insertar_vale";
@@ -534,32 +554,28 @@ public class activity_emitir_vale extends AppCompatActivity   {
                             }catch (XmlPullParserException c){
                                 Toast.makeText(getApplicationContext(),c.getMessage(),Toast.LENGTH_LONG).show();
                             }
-                            }
                         }
-                ).start();
-
-
-            }else{
-                AlertDialog.Builder builder =new AlertDialog.Builder(this);
-                builder.setIcon(R.drawable.iconapp);
-                builder.setTitle("Se ha generado un error");
-                builder.setMessage(mensaje_error);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getApplicationContext(), "Error a grabar", Toast.LENGTH_LONG).show();
                     }
-                });
-                AlertDialog alertDialog =builder.create();
-                alertDialog.show();
-                alertDialog.getWindow().setGravity(Gravity.CENTER);
-
-            }
+            ).start();
 
 
+        }else{
+            AlertDialog.Builder builder =new AlertDialog.Builder(this);
+            builder.setIcon(R.drawable.iconapp);
+            builder.setTitle("Se ha generado un error");
+            builder.setMessage(mensaje_error);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Toast.makeText(getApplicationContext(), "Error a grabar", Toast.LENGTH_LONG).show();
+                }
+            });
+            AlertDialog alertDialog =builder.create();
+            alertDialog.show();
+            alertDialog.getWindow().setGravity(Gravity.CENTER);
 
+        }
     }
-
     private void barrar_progreso(){
 
         progressDoalog=new ProgressDialog(activity_emitir_vale.this);

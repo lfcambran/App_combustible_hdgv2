@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -61,6 +62,8 @@ import com.app_combustible_hdgv2.databinding.ActivityLoginBinding;
 import com.app_combustible_hdgv2.MainActivity;
 import com.app_combustible_hdgv2.utilidades.MarshalDouble;
 import com.app_combustible_hdgv2.utilidades.varibles_globales;
+
+
 import java.io.IOException;
 
 public class LoginActivity extends AppCompatActivity {
@@ -102,6 +105,16 @@ public class LoginActivity extends AppCompatActivity {
         final ProgressBar loadingProgressBar = binding.loading;
         final TextView localizacionText= binding.localizacion;
         final Switch guardarsession = binding.recordarUser;
+        final TextView versionapp = binding.versionApp;
+
+        try {
+            PackageManager manager = this.getPackageManager();
+            PackageInfo info = manager.getPackageInfo(this.getPackageName(), PackageManager.GET_ACTIVITIES);
+            versionapp.setText("Version: " + info.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
 
         if (revisar_check()){
             guardarsession.setChecked(true);
@@ -109,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         binding.localizacion.setText("Latitud:" + ug.getlatitud() + " Longitud: " + ug.getlongitu() );
+
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
             public void onChanged(@Nullable LoginFormState loginFormState) {
@@ -295,6 +309,8 @@ public class LoginActivity extends AppCompatActivity {
                         alertDialog.getWindow().setGravity(Gravity.CENTER);
                         e.printStackTrace();
                         //Toast.makeText(getApplicationContext(), "Error: " + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+                    } catch (Exception e){
+                        Toast.makeText(getApplicationContext(), "Usuario Recordado: " + usernameEditText.getText(), Toast.LENGTH_LONG).show();
                     }
 
 

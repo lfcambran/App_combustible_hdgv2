@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/txtTitle"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="160dp"
             android:layout_alignLeft ="@+id/txtnodoc"
             android:text="Matricula"
             android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtmatricuala"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="160dp"
             android:layout_alignLeft ="@+id/txtnodoc"
             android:text="Fecha Reporte" />
 
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txtCantidad"
             android:layout_alignLeft="@+id/txtCantidad"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="160dp"
             android:layout_marginTop="-16dp"
             android:text="Valor" />
 
@@ -102,7 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txttotal"
             android:layout_alignLeft="@id/txttotal"
-            android:layout_marginLeft="150dp"
+            android:layout_marginLeft="160dp"
             android:layout_marginTop="-16dp"
             android:text="emitido" />
     </RelativeLayout>

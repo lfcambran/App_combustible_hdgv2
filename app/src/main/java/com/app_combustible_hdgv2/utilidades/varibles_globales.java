@@ -4,8 +4,13 @@ public class varibles_globales {
 
     private static double latitud=0;
     private static double longitu=0;
-
-
+    private static String autorizado_aterrizaje;
+    public String getAutorizado_aterrizaje() {
+        return autorizado_aterrizaje;
+    }
+    public void setAutorizado_aterrizaje(String autorizado_aterrizaje) {
+        varibles_globales.autorizado_aterrizaje = autorizado_aterrizaje;
+    }
     public double getlatitud() {
         return latitud;
     }

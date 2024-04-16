@@ -23,36 +23,58 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app_combustible_hdgv2.databinding.ActivityMainBinding;
 import com.app_combustible_hdgv2.ui.login.LoginActivity;
+import com.app_combustible_hdgv2.utilidades.MarshalDouble;
+import com.app_combustible_hdgv2.utilidades.varibles_globales;
 import com.google.android.material.snackbar.Snackbar;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     TextView tusuario;
-    String uname;
+    String uname,nombrecompleto;
+    private SoapObject resultRequestSOAP = null;
     private final static String CHANNEL_ID = "NOTIFICACION";
     private final static int NOTIFICACION_ID = 0;
-    private CardView nuevo_vale, lista_vales;
+    private CardView nuevo_vale, lista_vales,nuevo_aterrizaje;
+    private LinearLayout opciones;
     private ActivityMainBinding binding;
     private AppBarConfiguration appBarConfiguration;
     private static final int REQUEST_LOCATION = 1;
-
+    final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
+    final String NAMESPACES = "http://tempuri.org/";
+    private varibles_globales ug;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         uname = getIntent().getStringExtra("nombre_usuario");
-        setTitle("Principal-" + uname);
         tusuario = findViewById(R.id.tnousuario);
         tusuario.setText("Usuario: " + uname);
 
+        opciones=findViewById(R.id.nueva_opcion);
+        ug = new varibles_globales();
             createNotificationChannel();
             createNotification();
-
-
+            consultar_datos(uname);
+            if (ug.getAutorizado_aterrizaje().equals("true")){
+                opciones.setVisibility(View.VISIBLE);
+            }else{
+                opciones.setVisibility(View.GONE);
+            };
+        setTitle("Principal-" + nombrecompleto);
     }
 
     public void cerrar_session(View view) {
@@ -80,11 +102,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void listado_vales(View v) {
         CardView c = (CardView) v;
-        Snackbar.make(v, "Listado de Vales", Snackbar.LENGTH_LONG).setAnchorView(R.id.cerrarsesion).setAction("Action", null).show();
         Intent listavales = new Intent(MainActivity.this, activity_lista_vales.class);
         listavales.putExtra("nombre_usuario", uname);
         startActivity(listavales);
 
+    }
+
+    public void nuevo_aterrizaje(View V){
+
+        Intent aterrizaje = new Intent(MainActivity.this, activity_aterrizaje.class);
+        aterrizaje.putExtra("nombre_usuario",uname);
+        startActivity(aterrizaje);
+        setResult(Activity.RESULT_OK);
     }
 
     public void acercade(View v) {
@@ -138,6 +167,42 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         notificationManagerCompat.notify(NOTIFICACION_ID, builder.build());
+    }
+
+    private void consultar_datos(String user){
+        final String SOAP_ACTION ="http://tempuri.org/consultar_datos_usuario";
+        final String METHOD_NAME = "consultar_datos_usuario";
+
+        SoapObject resquest = new SoapObject(NAMESPACES,METHOD_NAME);
+        MarshalDouble md = new MarshalDouble();
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        md.register(envelope);
+        envelope.dotNet=true;
+        envelope.implicitTypes=true;
+        envelope.encodingStyle=SoapSerializationEnvelope.XSD;
+
+        resquest.addProperty("codigo_usuario",user);
+        envelope.setOutputSoapObject(resquest);
+        HttpTransportSE transportSE =new HttpTransportSE(URL);
+
+        try {
+            transportSE.call(SOAP_ACTION,envelope);
+            resultRequestSOAP=(SoapObject) envelope.getResponse();
+
+            int nPropiedades = resultRequestSOAP.getPropertyCount();
+            for (int i = 0; i < nPropiedades; i++)
+            {
+                SoapObject ic = (SoapObject)resultRequestSOAP.getProperty(i);
+                ug.setAutorizado_aterrizaje(ic.getProperty("opcionadmin").toString());
+                nombrecompleto=ic.getProperty("nombreCompleto_usuario").toString();
+            }
+
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }catch (XmlPullParserException e){
+            e.printStackTrace();
+        }
     }
 
 }
