@@ -1,6 +1,8 @@
 package com.app_combustible_hdgv2.utilidades;
 
 public class lista_sucursales {
+    private int codigosucursal;
+    private String nombre_sucursal;
 
     public lista_sucursales(){};
 
@@ -8,8 +10,6 @@ public class lista_sucursales {
         setCodigo_sucursal(codigo);
         setNombre_sucursal(sucursal);
     }
-    private int codigosucursal;
-    private String nombre_sucursal;
 
     public int getCodigo_sucursal(){
         return codigosucursal;

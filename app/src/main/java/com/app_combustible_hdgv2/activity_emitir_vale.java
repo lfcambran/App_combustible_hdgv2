@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.SigningInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -799,7 +800,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
     }catch (XmlPullParserException e){
         e.printStackTrace();
     }
-}
+    }
 private void llenar_matriculas(){
         final String SOAP_ACTION="http://tempuri.org/listado_matriculas";
         final String METHOD_NAME="listado_matriculas";

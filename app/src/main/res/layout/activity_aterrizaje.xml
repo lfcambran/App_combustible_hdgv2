@@ -6,6 +6,7 @@
     android:layout_height="fill_parent"
     android:scrollbars="vertical"
     android:fillViewport="true"
+    android:id="@+id/sview"
     tools:ignore="MissingConstraints">
 
 <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,23 +17,291 @@
 
 
         <LinearLayout
+
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
             android:orientation="vertical"
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
+            app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints"
-            >
+            tools:layout_editor_absoluteX="0dp">
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fab"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="78dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="Fecha:"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                            app:layout_constraintBottom_toTopOf="@+id/date_field"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                        <EditText
+                            android:id="@+id/fecha_vale"
+                            android:layout_width="163dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="-5dp"
+                            android:ems="10"
+                            android:gravity="center"
+                            android:hint="Fecha"
+                            android:importantForAutofill="no"
+                            app:layout_constraintBottom_toTopOf="@+id/guideline"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="1dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="2dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="76dp"
+                                    android:layout_height="wrap_content"
+                                    android:paddingStart="1dp"
+                                    android:text="Sucursal:" />
+
+                                <Spinner
+                                    android:id="@+id/sucursal"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="48dp"
+                                    android:paddingStart="10dp"
+                                    android:layout_alignParentStart="true"
+                                    android:ems="10" />
+                        </LinearLayout>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tipo Cliente:"
+                            />
+                        <Spinner
+                            android:id="@+id/tipocliente"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:paddingEnd="10dp"
+                            android:hint="Tipo Cliente"
+                            android:ems="10"
+                            android:spinnerMode="dialog"
+                            />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/matricula"
+                            android:layout_width="78dp"
+                            android:layout_height="wrap_content"
+                            android:text="Matriculas:"
+                            android:spinnerMode="dialog"/>
+
+                        <Spinner
+                            android:id="@+id/matriculas"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:paddingEnd="10dp"
+                            android:hint="matriculas"
+                            android:spinnerMode="dialog"
+                            />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Producto:" />
+
+                        <EditText
+                            android:id="@+id/cproducto"
+                            android:layout_width="80dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="-5dp"
+                            android:enabled="true"
+                            android:inputType="numberDecimal" />
+
+                        <TextView
+                            android:id="@+id/nombreproducto"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="left"
+                            android:text="Nombre Producto" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="48dp"
+                            android:layout_height="wrap_content"
+                            android:text="Precio:"/>
+                        <EditText
+                            android:id="@+id/precio"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:enabled="false"
+                            android:inputType="numberDecimal"/>
+                        <TextView
+                            android:layout_marginLeft="10dp"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:text="Cantidad:"
+                            />
+                        <EditText
+                            android:id="@+id/cantidad"
+                            android:layout_width="90dp"
+                            android:inputType="numberDecimal"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:hint="0"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end|center"
-                    android:layout_margin="24dp"
-                    android:contentDescription="@string/salir_pantalla"
-                    android:src="@drawable/baseline_arrow_back_24"
-                    app:tint="@color/white" />
+                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="18dp"
+
+                            android:text="Total Aterrizaje:"/>
+
+                        <EditText
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberDecimal"
+                            android:id="@+id/total_aterrizaje"
+                            android:hint="0"
+                            android:enabled="false"
+                            android:layout_marginBottom="-5dp"
+                            android:gravity="center"
+                            />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="51dp"
+                            android:layout_height="wrap_content"
+                            android:text="Firma:" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="180dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:orientation="vertical"
+                            android:padding="1dip"
+                            android:background="@drawable/bordes"
+                            >
+                        <com.kyanogen.signatureview.SignatureView xmlns:sign="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/signature_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="10dp"
+                            sign:backgroundColor="@color/white"
+                            sign:enableSignature="true"
+                            sign:penColor="#000000"
+                            sign:penSize="3dp"
+
+                            />
+                        </LinearLayout>
+                </LinearLayout>
+                 <LinearLayout
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:orientation="horizontal"
+                         android:gravity="right">
+                         <Button
+                             android:id="@+id/limpiarf"
+                             android:layout_width="180dp"
+                             android:layout_height="wrap_content"
+                             android:layout_below="@id/tomar_foto"
+                             android:textColor="@color/white"
+                             android:layout_gravity="left"
+                             android:layout_marginLeft="100dp"
+                             android:layout_toLeftOf="@id/tomar_foto"
+                             android:text="Limpiar Firma" />
+
+                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="5dp"
+                    >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Correo Cliente:" />
+
+                        <EditText
+                            android:id="@+id/correo_cliente"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:hint="(opcional)"
+                            android:inputType="textEmailAddress" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                        <Button
+                            android:id="@+id/grabar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="10dp"
+                            android:backgroundTint="@color/segundario"
+                            android:gravity="center"
+                            android:text="Grabar"
+                            android:onClick="grabar_vale"
+                            />
+                </LinearLayout>
+
+
         </LinearLayout>
 
 

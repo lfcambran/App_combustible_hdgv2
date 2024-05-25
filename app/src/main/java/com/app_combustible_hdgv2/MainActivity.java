@@ -65,12 +65,14 @@ public class MainActivity extends AppCompatActivity {
         tusuario.setText("Usuario: " + uname);
 
         opciones=findViewById(R.id.nueva_opcion);
+        consultar_notificaciones();
         ug = new varibles_globales();
             createNotificationChannel();
             createNotification();
             consultar_datos(uname);
             if (ug.getAutorizado_aterrizaje().equals("true")){
                 opciones.setVisibility(View.VISIBLE);
+
             }else{
                 opciones.setVisibility(View.GONE);
             };
@@ -132,6 +134,22 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.show();
     }
+    private void vernotificaciones(String mensaje){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notificaciones");
+        builder.setIcon(R.drawable.baseline_notifications_active_24);
+        builder.setCancelable(false);
+        builder.setMessage(mensaje);
+        builder.setNegativeButton("Cerrar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -167,6 +185,41 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         notificationManagerCompat.notify(NOTIFICACION_ID, builder.build());
+    }
+
+    private  void consultar_notificaciones(){
+        final String SOAP_ACTION ="http://tempuri.org/consultar_notificacion";
+        final String METHOD_NAME = "consultar_notificacion";
+        String estado_notifica = null,mensaje_notifica=null;
+        SoapObject resquest = new SoapObject(NAMESPACES,METHOD_NAME);
+        MarshalDouble md = new MarshalDouble();
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        md.register(envelope);
+        envelope.dotNet=true;
+        envelope.implicitTypes=true;
+        envelope.encodingStyle=SoapSerializationEnvelope.XSD;
+        envelope.setOutputSoapObject(resquest);
+        HttpTransportSE transportSE =new HttpTransportSE(URL);
+        try{
+            transportSE.call(SOAP_ACTION,envelope);
+            resultRequestSOAP=(SoapObject) envelope.getResponse();
+
+            int nPropiedades = resultRequestSOAP.getPropertyCount();
+            for (int i = 0; i < nPropiedades; i++)
+            {
+                SoapObject ic = (SoapObject)resultRequestSOAP.getProperty(i);
+                estado_notifica=ic.getProperty("estado_notificacion").toString();
+                mensaje_notifica=ic.getProperty("mensaje").toString();
+
+            }
+            if (estado_notifica.equals("true")){
+                vernotificaciones(mensaje_notifica);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }catch (XmlPullParserException e){
+            e.printStackTrace();
+        }
     }
 
     private void consultar_datos(String user){

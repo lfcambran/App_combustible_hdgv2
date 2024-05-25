@@ -118,8 +118,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/naterrizaje"
-            android:layout_width="100dp"
-            android:layout_height="89dp"
+            android:layout_width="130dp"
+            android:layout_height="100dp"
             android:layout_margin="10dp"
             android:onClick="nuevo_aterrizaje"
             app:cardCornerRadius="10dp"
