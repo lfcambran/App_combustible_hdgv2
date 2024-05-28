@@ -11,7 +11,7 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linearLayoutCompat"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="180dp"
         android:background="@color/colorazul"
         android:gravity="center"
         android:orientation="vertical"
@@ -74,6 +74,19 @@
 
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/groupaterrizaje"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <CheckBox
+                android:id="@+id/ver_aterrizajes"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:textColor="@color/white"
+                android:buttonTint="@color/white"
+                android:text="Lista Aterrizaje"/>
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
@@ -95,9 +108,9 @@
         android:id="@+id/lv_doc"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:dividerHeight="10.0sp"
+        android:dividerHeight="8.0sp"
         android:scrollbars="vertical"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="180dp"
         tools:listitem="@layout/list_vales"
         />
 

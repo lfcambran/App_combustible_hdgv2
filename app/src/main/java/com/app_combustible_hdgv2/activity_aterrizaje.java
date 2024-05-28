@@ -3,18 +3,31 @@ package com.app_combustible_hdgv2;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Base64;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewDebug;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -26,6 +39,7 @@ import com.app_combustible_hdgv2.utilidades.MarshalDouble;
 import com.app_combustible_hdgv2.utilidades.lista_matriculas;
 import com.app_combustible_hdgv2.utilidades.lista_sucursales;
 import com.app_combustible_hdgv2.utilidades.lista_tipocliente;
+import com.app_combustible_hdgv2.utilidades.varibles_globales;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.kyanogen.signatureview.SignatureView;
@@ -38,6 +52,7 @@ import org.ksoap2.transport.HttpResponseException;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Struct;
 import java.text.DecimalFormat;
@@ -51,21 +66,26 @@ public class activity_aterrizaje extends AppCompatActivity {
     final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
     final String NAMESPACES = "http://tempuri.org/";
     private SoapObject resultRequestSOAP = null;
-    String uname,codigotransaccion,nombre_usuario = null,matricula;
-    EditText fecha_vale,codigo_producto,p_aterrizaje,cantidad_venta,total_venta;
+    String uname,codigotransaccion,nombre_usuario = null,matricula,mensaje_error;
+    EditText fecha_doc,codigo_producto,p_aterrizaje,cantidad_venta,total_venta,correo_cliente,observacion;
     TextView nombreproducto;
-    double precio_aterrizaje;
+    double precio_aterrizaje,longitud,latitud;;;
     DatePickerDialog picker;
     Spinner listasucursales,lmatriculas,lista_tipo_cliente;
-    int codigo_sucursal,codigo_empleado,codigo_matricula,codigoproducto;
+    int codigo_sucursal,codigo_empleado,codigo_matricula,codigoproducto,noerror,codigo_tipocliente;
     Button grabar,limpiarfirma;
     SignatureView firma;
     ScrollView scrollView;
+    Boolean correo_valido;
+    ProgressDialog progressDoalog;
+    varibles_globales gb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aterrizaje);
         setTitle("Registro de Aterrizajes");
+        gb = new varibles_globales();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         Date date = new Date();
         String fecha = dateFormat.format(date);
@@ -74,9 +94,9 @@ public class activity_aterrizaje extends AppCompatActivity {
         uname=getIntent().getStringExtra("nombre_usuario");
         nombreproducto=findViewById(R.id.nombreproducto);
         codigo_producto=findViewById(R.id.cproducto);
-        fecha_vale=findViewById(R.id.fecha_vale);
-        fecha_vale.setInputType(InputType.TYPE_NULL);
-        fecha_vale.setText(fecha);
+        fecha_doc=findViewById(R.id.fecha_doc);
+        fecha_doc.setInputType(InputType.TYPE_NULL);
+        fecha_doc.setText(fecha);
         listasucursales=findViewById(R.id.sucursal);
         lmatriculas=findViewById(R.id.matriculas);
         lista_tipo_cliente=findViewById(R.id.tipocliente);
@@ -85,7 +105,11 @@ public class activity_aterrizaje extends AppCompatActivity {
         limpiarfirma=findViewById(R.id.limpiarf);
         cantidad_venta=findViewById(R.id.cantidad);
         total_venta=findViewById(R.id.total_aterrizaje);
+        correo_cliente=findViewById(R.id.correo_cliente);
+        observacion=findViewById(R.id.observaciones);
         cantidad_venta.setEnabled(false);
+        longitud=gb.getlongitu();
+        latitud=gb.getlatitud();
         consultar_datos(uname);
         llenar_matriculas();
         Llenar_tipocliente();
@@ -93,7 +117,7 @@ public class activity_aterrizaje extends AppCompatActivity {
         buscar_nombre_producto(codigoproducto);
         generar_codigo_transaccion();
         firma=findViewById(R.id.signature_view);
-        fecha_vale.setOnClickListener(new View.OnClickListener() {
+        fecha_doc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Calendar cldr=Calendar.getInstance();
@@ -117,7 +141,7 @@ public class activity_aterrizaje extends AppCompatActivity {
                         }else{
                             dia_cero= String.valueOf(dayOfMonth);
                         }
-                        fecha_vale.setText(dia_cero + "-" + mes_cero + "-" + year);
+                        fecha_doc.setText(dia_cero + "-" + mes_cero + "-" + year);
                     }
                 },anio,mes,dia);
                 picker.show();
@@ -230,12 +254,279 @@ public class activity_aterrizaje extends AppCompatActivity {
         });
 
     grabar.setOnClickListener(new View.OnClickListener() {
+
         @Override
         public void onClick(View v) {
-            Toast.makeText(activity_aterrizaje.this,"Ingreso",Toast.LENGTH_LONG).show();
+
+            AlertDialog alertDialog = new AlertDialog.Builder(activity_aterrizaje.this)
+                    .setIcon(R.drawable.iconapp)
+                    .setTitle("Generar Documento de Aterrizaje")
+                    .setMessage("Se Creara el documento de Aterrizaje a la matricual: " + matricula + " Desea Continuar")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            creacion_documento();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(),"Accion Cancelada", Toast.LENGTH_LONG).show();
+                        }
+                    }).show();
+
         }
     });
 
+    correo_cliente.addTextChangedListener(new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            correo_valido=validar_correo(correo_cliente.getText().toString());
+        }
+    });
+    correo_cliente.setOnKeyListener(new View.OnKeyListener() {
+        @Override
+        public boolean onKey(View v, int keyCode, KeyEvent event) {
+            if ((event.getAction()==KeyEvent.ACTION_DOWN) && (keyCode==KeyEvent.KEYCODE_ENTER)){
+                correo_valido=validar_correo(correo_cliente.getText().toString());
+                HideKeyboard(correo_cliente);
+            }
+                return false;
+        }
+    });
+    }
+    Handler handle=new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            progressDoalog.incrementProgressBy(1);
+        }
+    };
+    private void barra_progreso(){
+        progressDoalog=new ProgressDialog(activity_aterrizaje.this);
+        progressDoalog.setMax(100);
+        progressDoalog.setIcon(R.drawable.iconapp);
+        progressDoalog.setIndeterminate(true);
+        progressDoalog.setMessage("Procesando.. por favor espere");
+        progressDoalog.setTitle("Generando Documento");
+        progressDoalog.setCancelable(false);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    while (progressDoalog.getProgress() <= progressDoalog.getMax()) {
+                        Thread.sleep(200);
+                        handle.sendMessage(handle.obtainMessage());
+                        if (progressDoalog.getProgress() == progressDoalog.getMax()) {
+                            progressDoalog.dismiss();
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        progressDoalog.show();
+    }
+
+    private void creacion_documento(){
+        if (validar_datos()==true){
+            barra_progreso();
+            new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                SoapPrimitive resultRequestSOAP=null;
+                                String SOAP_ACTION = "http://tempuri.org/insertar_aterrizaje";
+                                String METHOD_NAME = "insertar_aterrizaje";
+
+                                Bitmap SignBitmap=firma.getSignatureBitmap();
+                                String fechadoc = fecha_doc.getText().toString();
+                                String precio_a= p_aterrizaje.getText() .toString();
+                                String cantidad_a = cantidad_venta.getText().toString();
+                                String copia_correo_cliente=correo_cliente.getText().toString();
+                                String observaciones = observacion.getText().toString();
+                                String byte_str=Convertir_imagen(SignBitmap);
+
+                                SoapObject respuesta=new SoapObject(NAMESPACES,METHOD_NAME);
+                                MarshalDouble md = new MarshalDouble();
+                                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                                md.register(envelope);
+                                envelope.dotNet = true;
+                                envelope.implicitTypes=true;
+                                envelope.encodingStyle = SoapSerializationEnvelope.XSD;
+
+
+                                if (copia_correo_cliente.length()>0) {
+                                    respuesta.addProperty("correocliente", copia_correo_cliente);
+                                }else if (copia_correo_cliente.length()==0){
+                                    respuesta.addProperty("correocliente","Sin Correo");
+                                }
+
+                                respuesta.addProperty("tipocliente",codigo_tipocliente);
+                                respuesta.addProperty("cmatricula",codigo_matricula);
+                                respuesta.addProperty("codigoempleado",codigo_empleado);
+                                respuesta.addProperty("codigosucursal",codigo_sucursal);
+                                respuesta.addProperty("fecha",fechadoc);
+                                respuesta.addProperty("creadopor",uname);
+                                respuesta.addProperty("observacion",observaciones);
+                                respuesta.addProperty("firma",byte_str);
+                                respuesta.addProperty("longitud",longitud);
+                                respuesta.addProperty("latitud",latitud);
+                                respuesta.addProperty("ctransaccion",codigotransaccion);
+                                respuesta.addProperty("codigoarticulo",codigoproducto);
+                                respuesta.addProperty("cantidad",Integer.valueOf( cantidad_a));
+                                respuesta.addProperty("valor",Double.valueOf(precio_a));
+                                respuesta.addProperty("usuario",uname);
+
+                                envelope.setOutputSoapObject(respuesta);
+
+                                HttpTransportSE transportSE=new HttpTransportSE(URL);
+                                transportSE.call(SOAP_ACTION,envelope);
+                                resultRequestSOAP=(SoapPrimitive) envelope.getResponse();
+
+                                String respuesta_insert = resultRequestSOAP.toString();
+                                String respuet = respuesta_insert.toString();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(activity_aterrizaje.this);
+                                builder.setCancelable(false);
+                                builder.setIcon(R.drawable.iconapp);
+
+                                if (respuet.equals("ok")){
+                                    progressDoalog.dismiss();
+                                    runOnUiThread(new Thread(){
+                                        public void run(){
+                                            builder.setTitle("Documento De Aterrizaje");
+                                            builder.setMessage("Se ha Generado el docuemento de Aterrizaje correctamente");
+                                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    Intent intent = new Intent(activity_aterrizaje.this,MainActivity.class);
+                                                    intent.putExtra("nombre_usuario",uname);
+                                                    startActivity(intent);
+                                                    setResult(Activity.RESULT_OK);
+                                                }
+                                            });
+                                            AlertDialog alertDialog =builder.create();
+                                            alertDialog.show();
+                                            alertDialog.getWindow().setGravity(Gravity.CENTER);
+                                        }
+                                    });
+                                }else{
+                                    progressDoalog.dismiss();
+                                    runOnUiThread(new Thread(){
+                                        public void run(){
+                                            builder.setTitle("Error al Emitir documento");
+                                            builder.setMessage("Error: " + respuet);
+                                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    Intent intent = new Intent(activity_aterrizaje.this,MainActivity.class);
+                                                    intent.putExtra("nombre_usuario",uname);
+                                                    startActivity(intent);
+                                                    setResult(Activity.RESULT_OK);
+                                                    Toast.makeText(getApplicationContext(), "Error: " + respuet.toString(), Toast.LENGTH_LONG).show();
+
+                                                }
+                                            });
+                                            AlertDialog alertDialog =builder.create();
+                                            alertDialog.show();
+                                            alertDialog.getWindow().setGravity(Gravity.CENTER);
+                                        }
+                                    });
+                                }
+
+                            }catch (IOException e){
+                                Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                            }catch (XmlPullParserException c){
+                                Toast.makeText(getApplicationContext(),c.getMessage(),Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+
+            ).start();
+        }else{
+            AlertDialog.Builder b = new AlertDialog.Builder(this);
+            b.setIcon(R.drawable.iconapp);
+            b.setTitle("Error al generar documento");
+            b.setMessage(mensaje_error);
+            b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(getApplicationContext(),"Error al grabar",Toast.LENGTH_LONG).show();
+
+                }
+            });
+            AlertDialog alertDialog=b.create();
+            alertDialog.show();
+            alertDialog.getWindow().setGravity(Gravity.CENTER);
+        }
+    }
+
+    private boolean validar_datos(){
+        float cantidad,precio;
+        mensaje_error="";
+        noerror=0;
+        String carticulo = codigo_producto.getText().toString();
+        String precio_a = p_aterrizaje.getText().toString();
+        String cantidad_a=cantidad_venta.getText().toString();
+        String correocliente= correo_cliente.getText().toString();
+
+
+        if (TextUtils.isEmpty(precio_a)){
+            precio =0;
+        }else{
+            precio = Float.parseFloat(precio_a);
+        }
+
+        if (TextUtils.isEmpty(cantidad_a)){
+            cantidad=0;
+        }else {
+            cantidad=Float.parseFloat(cantidad_a);
+        }
+
+        if (correocliente.length()>0){
+            if (correo_valido==false){
+                mensaje_error=mensaje_error + " El Correo del cliente es incorrecto" + "\n";
+                noerror +=1;
+            }
+        }
+
+        if(carticulo.length()==0){
+            mensaje_error=mensaje_error + " Debe de Ingresar el codigo del producto" + "\n";
+            noerror+=1;
+        }
+        if (precio==0){
+            mensaje_error=mensaje_error + " El precio de venta no puede Cero" + "\n";
+            noerror+=1;
+        }
+        if (cantidad==0){
+            mensaje_error = mensaje_error + " La cantidad de venta no puede ser cero" + "\n";
+            noerror+=1;
+        }
+        if (codigo_matricula==-1){
+            mensaje_error = mensaje_error + " Debe de seleccionar una matricula" + "\n";
+            noerror+=1;
+        }
+
+        if (noerror==0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
     public void seleccion_sucursal_OnClik(){
@@ -250,7 +541,13 @@ public class activity_aterrizaje extends AppCompatActivity {
         codigotransaccion="";
         codigotransaccion=uname + " - " + fechaHora;
     }
-
+    public String Convertir_imagen(Bitmap bmp){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+    }
     private void consultar_datos(String user){
         final String SOAP_ACTION ="http://tempuri.org/consultar_datos_usuario";
         final String METHOD_NAME = "consultar_datos_usuario";
@@ -411,7 +708,7 @@ public class activity_aterrizaje extends AppCompatActivity {
         SoapPrimitive rs= null;
         final String SOAP_ACTION="http://tempuri.org/tipo_cliente_matricula";
         final String METHOD_NAME="tipo_cliente_matricula";
-        int codigo_tipocliente;
+
         lista_matriculas m=(lista_matriculas) lmatriculas .getSelectedItem();
         String matricula_select=m.toString();
         codigo_matricula = m.getCodigomatricula();
@@ -429,10 +726,11 @@ public class activity_aterrizaje extends AppCompatActivity {
            try{
                 tse.call(SOAP_ACTION,env);
                 rs=(SoapPrimitive) env.getResponse();
+                int ctc;
                 codigo_tipocliente=Integer.parseInt(rs.toString());
-                codigo_tipocliente=codigo_tipocliente-1;
+                ctc=codigo_tipocliente-1;
                 if (codigo_tipocliente!=-1){
-                    lista_tipo_cliente.setSelection(codigo_tipocliente);
+                    lista_tipo_cliente.setSelection(ctc);
                     buscar_precio_aterrizaje(codigo_matricula,codigo_sucursal);
                 }else{
                     lista_tipo_cliente.setSelection(1);
@@ -537,6 +835,18 @@ public class activity_aterrizaje extends AppCompatActivity {
             Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
         }catch (XmlPullParserException e){
             Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
+        }
+    }
+    private void HideKeyboard(View v){
+        InputMethodManager imm=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(),0);
+    }
+    private Boolean validar_correo(String correo){
+        String emailRegex="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        if (correo.matches(emailRegex)){
+            return true;
+        }else{
+            return false;
         }
     }
 }

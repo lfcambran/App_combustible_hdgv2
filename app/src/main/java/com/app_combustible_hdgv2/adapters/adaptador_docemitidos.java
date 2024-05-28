@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.app_combustible_hdgv2.R;
@@ -17,13 +18,14 @@ import java.util.Objects;
 public class adaptador_docemitidos extends BaseAdapter {
     private Context context;
     private ArrayList<lista_data> listItems;
-
+    private boolean aterrizaje;
     public adaptador_docemitidos(Context context, ArrayList<lista_data> datos) {
         this.context = context;
         this.listItems = datos;
     }
 
-
+    public boolean getaterrizaje(){return aterrizaje;}
+    public void  setAterrizaje (boolean at){this.aterrizaje=at;}
     @Override
     public int getCount(){ return listItems.size();}
     @Override
@@ -50,7 +52,7 @@ public class adaptador_docemitidos extends BaseAdapter {
         TextView txtvalor = convertView.findViewById(R.id.txt_valor);
         TextView txttotal = convertView.findViewById(R.id.txttotal);
         TextView txtemitido = convertView.findViewById(R.id.txtemitidopor);
-
+        TextView txttipo_cliente = convertView.findViewById(R.id.txttipocliente);
 
         txtTitle.setText("Documento Emitido");
         txtcorrelativo.setText("Correlativo:" + item.correlativo);
@@ -61,6 +63,13 @@ public class adaptador_docemitidos extends BaseAdapter {
         txtvalor.setText("Valor: Q." + String.valueOf(item.valor_vale));
         txttotal.setText("Total Doc.: Q. " + String.valueOf(item.total));
         txtemitido.setText("Emitido:" + item.emitidopor);
+        txttipo_cliente.setText("Tipo Cliente: " + item.tipocliente);
+        if (aterrizaje){
+            txttipo_cliente.setVisibility(View.VISIBLE);
+            txttipo_cliente.setText("Tipo Cliente:" + item.tipocliente);
+        }else {
+            txttipo_cliente.setVisibility(View.GONE);
+        }
         return convertView;
     }
 

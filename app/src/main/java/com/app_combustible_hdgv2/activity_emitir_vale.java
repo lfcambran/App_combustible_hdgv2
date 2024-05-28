@@ -44,6 +44,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -633,6 +634,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         }else {
              precio=Float.parseFloat(precio_g);
         }
+
         if (TextUtils.isEmpty( cantidad_v)){
             cantidad=0;
         }else {

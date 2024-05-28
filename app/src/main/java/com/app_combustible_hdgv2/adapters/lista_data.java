@@ -7,7 +7,7 @@ public class lista_data {
     int numerovale,correlativo;
     String matricula;
     String fecha;
-    String emitidopor;
+    String emitidopor,tipocliente;
     double cantidad,valor_vale,total;
 
     public int getCorrelativo(){return correlativo;}
@@ -19,6 +19,8 @@ public class lista_data {
         this.emitidopor = emitidopor;
     }
 
+    public String getTipocliente(){return  tipocliente;}
+    public void setTipocliente(String tipocliente){this.tipocliente=tipocliente;}
     public int getNumerovale() {
         return numerovale;
     }
