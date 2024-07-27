@@ -5,10 +5,11 @@
         <item name="colorPrimary">@color/primary_app</item>
         <item name="colorPrimaryVariant">@color/botones</item>
         <item name="colorOnPrimary">@color/white</item>
+
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/segundario</item>
+        <item name="colorSecondary">#FC2447F1</item>
         <item name="colorSecondaryVariant">@color/primary_app</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->

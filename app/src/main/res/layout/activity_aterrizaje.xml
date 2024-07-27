@@ -278,6 +278,7 @@
                              android:layout_height="wrap_content"
                              android:layout_below="@id/tomar_foto"
                              android:textColor="@color/white"
+                             android:backgroundTint="@color/botones_secundario"
                              android:layout_gravity="left"
                              android:layout_marginLeft="100dp"
                              android:layout_toLeftOf="@id/tomar_foto"

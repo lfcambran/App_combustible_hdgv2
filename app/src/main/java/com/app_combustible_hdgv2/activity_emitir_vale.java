@@ -429,6 +429,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
               }
           })
                 .show();
+
     }
 
     private void creacion_vale(){
