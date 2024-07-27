@@ -213,6 +213,29 @@
 
                 </LinearLayout>
                 <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="18dp"
+
+                    android:text="Recibido por:"/>
+
+                        <EditText
+                            android:id="@+id/recibidopor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:hint="Recibido por"/>
+
+
+                </LinearLayout>
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginTop="15dp"
@@ -234,7 +257,7 @@
                         <com.kyanogen.signatureview.SignatureView xmlns:sign="http://schemas.android.com/apk/res-auto"
                             android:id="@+id/signature_view"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_height="250dp"
                             android:paddingEnd="10dp"
                             sign:backgroundColor="@color/white"
                             sign:enableSignature="true"

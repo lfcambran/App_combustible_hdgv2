@@ -67,7 +67,7 @@ public class activity_aterrizaje extends AppCompatActivity {
     final String NAMESPACES = "http://tempuri.org/";
     private SoapObject resultRequestSOAP = null;
     String uname,codigotransaccion,nombre_usuario = null,matricula,mensaje_error;
-    EditText fecha_doc,codigo_producto,p_aterrizaje,cantidad_venta,total_venta,correo_cliente,observacion;
+    EditText fecha_doc,codigo_producto,p_aterrizaje,cantidad_venta,total_venta,correo_cliente,observacion,recibidopor;
     TextView nombreproducto;
     double precio_aterrizaje,longitud,latitud;;;
     DatePickerDialog picker;
@@ -107,6 +107,7 @@ public class activity_aterrizaje extends AppCompatActivity {
         total_venta=findViewById(R.id.total_aterrizaje);
         correo_cliente=findViewById(R.id.correo_cliente);
         observacion=findViewById(R.id.observaciones);
+        recibidopor=findViewById(R.id.recibidopor);
         cantidad_venta.setEnabled(false);
         longitud=gb.getlongitu();
         latitud=gb.getlatitud();
@@ -384,6 +385,7 @@ public class activity_aterrizaje extends AppCompatActivity {
                                 respuesta.addProperty("fecha",fechadoc);
                                 respuesta.addProperty("creadopor",uname);
                                 respuesta.addProperty("observacion",observaciones);
+                                respuesta.addProperty("recibidopor",recibidopor.getText().toString());
                                 respuesta.addProperty("firma",byte_str);
                                 respuesta.addProperty("longitud",longitud);
                                 respuesta.addProperty("latitud",latitud);
@@ -392,6 +394,7 @@ public class activity_aterrizaje extends AppCompatActivity {
                                 respuesta.addProperty("cantidad",Integer.valueOf( cantidad_a));
                                 respuesta.addProperty("valor",Double.valueOf(precio_a));
                                 respuesta.addProperty("usuario",uname);
+
 
                                 envelope.setOutputSoapObject(respuesta);
 
@@ -484,7 +487,7 @@ public class activity_aterrizaje extends AppCompatActivity {
         String precio_a = p_aterrizaje.getText().toString();
         String cantidad_a=cantidad_venta.getText().toString();
         String correocliente= correo_cliente.getText().toString();
-
+        String recibido=recibidopor.getText().toString();
 
         if (TextUtils.isEmpty(precio_a)){
             precio =0;
@@ -497,12 +500,21 @@ public class activity_aterrizaje extends AppCompatActivity {
         }else {
             cantidad=Float.parseFloat(cantidad_a);
         }
+        if (recibido.length()==0){
+            mensaje_error=mensaje_error + " Debe de Especificar quien recibe el servicio " + "\n";
+            noerror+=1;
+        }
 
         if (correocliente.length()>0){
             if (correo_valido==false){
                 mensaje_error=mensaje_error + " El Correo del cliente es incorrecto" + "\n";
                 noerror +=1;
             }
+        }
+
+        if (firma.isBitmapEmpty()){
+            mensaje_error=mensaje_error + " El Documento no se encuentra firmado";
+            noerror +=1;
         }
 
         if(carticulo.length()==0){

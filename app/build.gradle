@@ -14,7 +14,7 @@ android {
         minSdk 26
         targetSdk 33
         versionCode 1
-        versionName "2.2.1"
+        versionName "2.2.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -54,4 +54,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.kyanogen.signatureview:signature-view:1.2'
+
 }

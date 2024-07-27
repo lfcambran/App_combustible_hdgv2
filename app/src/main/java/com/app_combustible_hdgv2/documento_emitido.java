@@ -2,7 +2,9 @@ package com.app_combustible_hdgv2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +27,7 @@ public class documento_emitido extends AppCompatActivity  {
     TextView correlativo,matricula,sucursal,movimiento,novale,
     fechavale,creado,piloto,cantidad,valor,total,facturado,estado;
 
-    Button cerrar,reenviar;
+    Button cerrar,reenviar,imprimir;
     final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
     final String NAMESPACES = "http://tempuri.org/";
 
@@ -51,6 +53,7 @@ public class documento_emitido extends AppCompatActivity  {
         estado=(TextView) findViewById(R.id.txtestado);
         cerrar=(Button) findViewById(R.id.cerrar);
         reenviar=(Button) findViewById(R.id.reenviar);
+        imprimir=(Button) findViewById(R.id.btnimprimir);
         correlativodoc= getIntent().getIntExtra("correlativo_doc",0);
         correlativo.setText(String.valueOf(correlativodoc));
         consultar_doc_emitido(correlativodoc);
@@ -68,8 +71,65 @@ public class documento_emitido extends AppCompatActivity  {
                 reenvio_documento(correlativodoc);
             }
         });
-    }
+        imprimir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url;
+                String rconsulta=verificacion_documento(correlativodoc);
+                if (rconsulta.equals("OK")){
+                url= "http://200.30.144.133:3427/reportes_app/documento_no_" + correlativodoc + ".pdf"  ;
+                Toast.makeText(getApplicationContext(),"Visualizando Reportes",Toast.LENGTH_LONG).show();
 
+               /* Intent vistapdf = new Intent( documento_emitido.this, visor_pdfview.class);
+                vistapdf.putExtra("ruta_pdf", url);
+                startActivity(vistapdf);*/
+                Intent intent = new Intent();
+                intent.setDataAndType(Uri.parse(url), "application/pdf");
+                startActivity(intent);
+                }else{
+                    Toast.makeText(getApplicationContext(),"Error: " + rconsulta ,Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+    public String verificacion_documento(int cdoc){
+        SoapPrimitive resultRequestSOAP = null;
+        final String SOAP_ACTION="http://tempuri.org/consultar_documento_emitido";
+        final String METHOD_NAME="consultar_documento_emitido";
+        String resultado="";
+        SoapObject resquest = new SoapObject(NAMESPACES,METHOD_NAME);
+
+        MarshalDouble md = new MarshalDouble();
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        md.register(envelope);
+        envelope.dotNet=true;
+        envelope.implicitTypes=true;
+        envelope.encodingStyle=SoapSerializationEnvelope.XSD;
+
+        resquest.addProperty("nombrearchivo", "documento_no_" + String.valueOf(cdoc) );
+        resquest.addProperty("norepeorte",cdoc);
+        resquest.addProperty("tipo", "Combustible");
+        envelope.setOutputSoapObject(resquest);
+        HttpTransportSE transportSE = new HttpTransportSE(URL);
+
+        try {
+            transportSE.call(SOAP_ACTION,envelope);
+            resultRequestSOAP = (SoapPrimitive) envelope.getResponse();
+            String res_envio = resultRequestSOAP.toString();
+            String respuet = res_envio.toString();
+
+            if (respuet.equals("OK")){
+                resultado=respuet.toString();
+            }else {
+               resultado= respuet.toString();
+            }
+        } catch (IOException e){
+            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+        }catch (XmlPullParserException d){
+            Toast.makeText(getApplicationContext(),d.getMessage(),Toast.LENGTH_LONG).show();
+        }
+        return resultado;
+    }
     public void consultar_doc_emitido(int c){
         final String SOAP_ACTION ="http://tempuri.org/vale_emitido";
         final String METHOD_NAME = "vale_emitido";
