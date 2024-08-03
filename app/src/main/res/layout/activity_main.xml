@@ -156,7 +156,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:backgroundTint="@color/botones"
+                android:backgroundTint="@color/colorazul"
                 android:onClick="cerrar_session"
                 android:text="Cerrar sesion"
                 android:textColor="@color/white" />
@@ -169,8 +169,7 @@
             android:textColor="@color/white"
             android:layout_marginTop="16dp"
             android:drawableStart="@drawable/user"
-
-            tools:text="prueba" />
+            tools:text="usuario" />
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/acercade"
             android:layout_width="wrap_content"

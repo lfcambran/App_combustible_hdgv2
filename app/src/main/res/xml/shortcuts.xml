@@ -11,6 +11,6 @@
             android:targetClass="com.app_combustible_hdgv2.ui.login.LoginActivity"
         />
         <categories android:name="android.shurtcut.Productivity"/>
-
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
     </shortcuts>
 </shortcuts>
