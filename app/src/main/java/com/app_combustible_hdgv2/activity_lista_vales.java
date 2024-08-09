@@ -6,6 +6,8 @@ import android.app.LauncherActivity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.app_combustible_hdgv2.adapters.adaptador_docemitidos;
 import com.app_combustible_hdgv2.utilidades.MarshalDouble;
@@ -65,12 +68,14 @@ public class activity_lista_vales extends AppCompatActivity implements View.OnCl
     CheckBox aterrizajes;
 
     LinearLayout grupoaterrizaje;
+    SwipeRefreshLayout mswrefresh;
 protected void onCreate(Bundle savedInstancesState) {
     super.onCreate(savedInstancesState);
     setTitle("Documentos Emitidos por Fecha");
     setContentView(R.layout.activity_lista_vales);
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     vg =new varibles_globales();
+    mswrefresh =(SwipeRefreshLayout) findViewById(R.id.swrefresh);
     adaptador_docemitidos=new ArrayList<String>();
     lv=(ListView)findViewById(R.id.lv_doc);
     aterrizajes=findViewById(R.id.ver_aterrizajes);
@@ -90,6 +95,7 @@ protected void onCreate(Bundle savedInstancesState) {
     String fecha = dateFormat.format(date);
     fecha_inicial.setText(fecha);
     fecha_final.setText(fecha);
+    mswrefresh.setColorSchemeResources(R.color.Rojo_advertencia);
     if (vg.getAutorizado_aterrizaje().equals("true")){
         grupoaterrizaje.setVisibility(View.VISIBLE);
     }else
@@ -105,6 +111,14 @@ protected void onCreate(Bundle savedInstancesState) {
                 doc_emitido.putExtra("correlativo_doc", correlativo_doc);
                 startActivity(doc_emitido);
             }
+        }
+    });
+    mswrefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+
+            consultar_documentos_emitidos();
+            mswrefresh.setRefreshing(false);
         }
     });
 }
@@ -295,4 +309,5 @@ protected void onCreate(Bundle savedInstancesState) {
             e.printStackTrace();
         }
     }
+
 }

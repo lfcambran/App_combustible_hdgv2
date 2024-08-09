@@ -421,6 +421,7 @@ public class activity_aterrizaje extends AppCompatActivity {
                                                     intent.putExtra("nombre_usuario",uname);
                                                     startActivity(intent);
                                                     setResult(Activity.RESULT_OK);
+                                                    finish();
                                                 }
                                             });
                                             AlertDialog alertDialog =builder.create();
@@ -442,7 +443,7 @@ public class activity_aterrizaje extends AppCompatActivity {
                                                     startActivity(intent);
                                                     setResult(Activity.RESULT_OK);
                                                     Toast.makeText(getApplicationContext(), "Error: " + respuet.toString(), Toast.LENGTH_LONG).show();
-
+                                                    finish();
                                                 }
                                             });
                                             AlertDialog alertDialog =builder.create();

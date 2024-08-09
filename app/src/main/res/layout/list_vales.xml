@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     card_view:cardCornerRadius="4dp">
 
     <ImageView
@@ -33,6 +34,7 @@
             android:layout_marginTop="15dp"
             android:checkMark="?android:attr/listChoiceIndicatorMultiple"
             android:text="Titulo"
+            android:textColor="@color/black"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
 
@@ -42,6 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtTitle"
             android:layout_alignLeft="@+id/txtTitle"
+            android:textColor="@color/black"
             android:text="Correlativo" />
         <TextView
             android:id="@+id/txtmatricuala"
@@ -51,6 +54,7 @@
             android:layout_marginLeft="160dp"
             android:layout_alignLeft ="@+id/txtnodoc"
             android:text="Matricula"
+            android:textColor="@color/black"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
@@ -59,7 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/txtmatricuala"
             android:layout_alignLeft="@+id/txtTitle"
-            android:text="noreporte" />
+            android:text="noreporte"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/txtfechareporte"
@@ -68,7 +73,8 @@
             android:layout_below="@+id/txtmatricuala"
             android:layout_marginLeft="160dp"
             android:layout_alignLeft ="@+id/txtnodoc"
-            android:text="Fecha Reporte" />
+            android:text="Fecha Reporte"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/txtCantidad"
@@ -76,7 +82,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txtnodoc"
             android:layout_alignLeft="@+id/txtTitle"
-            android:text="Cantidad" />
+            android:layout_marginTop="4dp"
+            android:text="Cantidad"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/txt_valor"
@@ -84,9 +92,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txtCantidad"
             android:layout_alignLeft="@+id/txtCantidad"
-            android:layout_marginLeft="160dp"
-            android:layout_marginTop="-16dp"
-            android:text="Valor" />
+            android:layout_marginLeft="161dp"
+            android:layout_marginTop="-20dp"
+            android:text="Valor"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/txttotal"
@@ -94,7 +103,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txtCantidad"
             android:layout_alignLeft="@+id/txtCantidad"
-            android:text="Total" />
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="5dp"
+            android:text="Total"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/txtemitidopor"
@@ -103,15 +115,20 @@
             android:layout_below="@id/txttotal"
             android:layout_alignLeft="@id/txttotal"
             android:layout_marginLeft="160dp"
-            android:layout_marginTop="-16dp"
-            android:text="emitido" />
+            android:layout_marginTop="-21dp"
+            android:text="emitido"
+            android:textColor="@color/black" />
+
         <TextView
             android:id="@+id/txttipocliente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/txttotal"
             android:layout_alignLeft="@id/txttotal"
-            android:text="TipoCliente"/>
+            android:layout_marginLeft="0dp"
+            android:layout_marginTop="8dp"
+            android:text="TipoCliente"
+            android:textColor="@color/black" />
     </RelativeLayout>
     
 </RelativeLayout>

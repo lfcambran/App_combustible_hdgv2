@@ -2,12 +2,19 @@ package com.app_combustible_hdgv2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +37,7 @@ public class documento_emitido extends AppCompatActivity  {
     Button cerrar,reenviar,imprimir;
     final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
     final String NAMESPACES = "http://tempuri.org/";
-
+    ProgressDialog progressDoalog;
     private SoapObject resultRequestSOAP = null;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,38 +191,103 @@ public class documento_emitido extends AppCompatActivity  {
         }
     }
     private void reenvio_documento(int doc){
-        SoapPrimitive resultRequestSOAP = null;
-        final String SOAP_ACTION ="http://tempuri.org/reenvio_vale";
-        final String METHOD_NAME = "reenvio_vale";
-        SoapObject resquest = new SoapObject(NAMESPACES,METHOD_NAME);
-        MarshalDouble md = new MarshalDouble();
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-        md.register(envelope);
-        envelope.dotNet=true;
-        envelope.implicitTypes=true;
-        envelope.encodingStyle=SoapSerializationEnvelope.XSD;
 
-        resquest.addProperty("codigo",doc);
-        envelope.setOutputSoapObject(resquest);
-        HttpTransportSE transportSE = new HttpTransportSE(URL);
+        barra_progreso();
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            SoapPrimitive resultRequestSOAP = null;
+                            final String SOAP_ACTION ="http://tempuri.org/reenvio_vale";
+                            final String METHOD_NAME = "reenvio_vale";
+                            SoapObject resquest = new SoapObject(NAMESPACES,METHOD_NAME);
+                            MarshalDouble md = new MarshalDouble();
+                            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                            md.register(envelope);
+                            envelope.dotNet=true;
+                            envelope.implicitTypes=true;
+                            envelope.encodingStyle=SoapSerializationEnvelope.XSD;
+
+                            resquest.addProperty("codigo",doc);
+                            envelope.setOutputSoapObject(resquest);
+                            HttpTransportSE transportSE = new HttpTransportSE(URL);
+
+                                transportSE.call(SOAP_ACTION,envelope);
+                                resultRequestSOAP = (SoapPrimitive) envelope.getResponse();
+                                String res_envio = resultRequestSOAP.toString();
+                                String respuet = res_envio.toString();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(documento_emitido.this);
+                                builder.setCancelable(false);
+                                builder.setIcon(R.drawable.iconapp);
+
+                                if (respuet.equals("ok")){
+                                    progressDoalog.dismiss();
+                                    runOnUiThread(new Thread(){
+                                        public void run(){
+                                            builder.setTitle("Reenvio de Vale Emitido");
+                                            builder.setMessage("Se ha Reenviado Correctamente El Vale");
+                                            builder.setPositiveButton("ok", new DialogInterface.OnClickListener(){
+
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Toast.makeText(getApplicationContext(),"Envio de correo satisfactorio", Toast.LENGTH_LONG ).show();
+                                                    finish();
+                                                }
+                                            });
+                                            AlertDialog alertDialog =builder.create();
+                                            alertDialog.show();
+                                            alertDialog.getWindow().setGravity(Gravity.CENTER);
+                                        }
+                                    });
+
+                                }else {
+                                    progressDoalog.dismiss();
+                                    Toast.makeText(getApplicationContext(), "Error: " + respuet.toString(), Toast.LENGTH_LONG).show();
+                                }
+
+                        }catch (IOException e){
+                            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                        }catch (XmlPullParserException d){
+                            Toast.makeText(getApplicationContext(),d.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+        ).start();
 
 
-        try {
-            transportSE.call(SOAP_ACTION,envelope);
-            resultRequestSOAP = (SoapPrimitive) envelope.getResponse();
-            String res_envio = resultRequestSOAP.toString();
-            String respuet = res_envio.toString();
-            if (respuet.equals("ok")){
-                Toast.makeText(this,"Envio de correo satisfactorio", Toast.LENGTH_LONG ).show();
-                finish();
-            }else {
-                Toast.makeText(getApplicationContext(), "Error: " + respuet.toString(), Toast.LENGTH_LONG).show();
+    }
+    Handler handler=new Handler(){
+      public void handleMessage(Message msg){
+          super.handleMessage(msg);
+          progressDoalog.incrementProgressBy(1);
+      }
+    };
+
+    private void barra_progreso(){
+        progressDoalog= new ProgressDialog(documento_emitido.this);
+        progressDoalog.setMax(100);
+        progressDoalog.setIcon(R.drawable.iconapp);
+        progressDoalog.setIndeterminate(true);
+        progressDoalog.setMessage("Enviando Documento.. por favor espere");
+        progressDoalog.setTitle("Reenvio de Documento");
+        progressDoalog.setCancelable(false);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (progressDoalog.getProgress()<= progressDoalog.getMax()){
+                        Thread.sleep(200);
+                        handler.handleMessage(handler.obtainMessage());
+                        if (progressDoalog.getProgress() == progressDoalog.getMax()) {
+                            progressDoalog.dismiss();
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
-        } catch (IOException e){
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
-        }catch (XmlPullParserException d){
-            Toast.makeText(getApplicationContext(),d.getMessage(),Toast.LENGTH_LONG).show();
-        }
-
+        }).start();
+        progressDoalog.show();
     }
 }
