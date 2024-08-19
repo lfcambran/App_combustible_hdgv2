@@ -119,13 +119,26 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:hint="tanque" />
-                    <Spinner
+                 <!--   <Spinner
                         android:id="@+id/matriculas"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:hint="matriculas"
                         android:spinnerMode="dialog"
+                        /> -->
+                    <TextView
+                        android:id="@+id/matricula"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="Seleccionar"
+                        android:textStyle="bold"
+                        android:textSize="18dp"
+                        android:gravity="center_vertical"
+                        android:padding="10dp"
+                        android:layout_marginRight="5dp"
+                        android:drawableEnd="@drawable/ic_arrow"
                         />
+
                 </LinearLayout>
 
             </LinearLayout>

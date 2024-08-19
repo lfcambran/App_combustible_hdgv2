@@ -5,11 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,6 +34,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -68,18 +73,18 @@ public class activity_aterrizaje extends AppCompatActivity {
     private SoapObject resultRequestSOAP = null;
     String uname,codigotransaccion,nombre_usuario = null,matricula,mensaje_error;
     EditText fecha_doc,codigo_producto,p_aterrizaje,cantidad_venta,total_venta,correo_cliente,observacion,recibidopor;
-    TextView nombreproducto;
+    TextView nombreproducto,matric;
     double precio_aterrizaje,longitud,latitud;;;
     DatePickerDialog picker;
     Spinner listasucursales,lmatriculas,lista_tipo_cliente;
-    int codigo_sucursal,codigo_empleado,codigo_matricula,codigoproducto,noerror,codigo_tipocliente;
+    int codigo_sucursal,codigo_empleado,codigo_matricula,codigoproducto,noerror,codigo_tipocliente,mode;
     Button grabar,limpiarfirma;
     SignatureView firma;
     ScrollView scrollView;
     Boolean correo_valido;
     ProgressDialog progressDoalog;
     varibles_globales gb;
-
+    Dialog dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +103,8 @@ public class activity_aterrizaje extends AppCompatActivity {
         fecha_doc.setInputType(InputType.TYPE_NULL);
         fecha_doc.setText(fecha);
         listasucursales=findViewById(R.id.sucursal);
-        lmatriculas=findViewById(R.id.matriculas);
+        /*lmatriculas=findViewById(R.id.matriculas);*/
+        matric=findViewById(R.id.matricula);
         lista_tipo_cliente=findViewById(R.id.tipocliente);
         p_aterrizaje=findViewById(R.id.precio);
         grabar=findViewById(R.id.grabar);
@@ -112,12 +118,13 @@ public class activity_aterrizaje extends AppCompatActivity {
         longitud=gb.getlongitu();
         latitud=gb.getlatitud();
         consultar_datos(uname);
-        llenar_matriculas();
+        /*llenar_matriculas();*/
         Llenar_tipocliente();
         consultar_codigo_producto();
         buscar_nombre_producto(codigoproducto);
         generar_codigo_transaccion();
         firma=findViewById(R.id.signature_view);
+        mode = this.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         fecha_doc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,7 +155,7 @@ public class activity_aterrizaje extends AppCompatActivity {
                 picker.show();
             }
         });
-        lmatriculas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      /*  lmatriculas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Object i=parent.getItemAtPosition(position);
@@ -162,8 +169,7 @@ public class activity_aterrizaje extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        });
-
+        });*/
         listasucursales.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
 
             @Override
@@ -220,6 +226,90 @@ public class activity_aterrizaje extends AppCompatActivity {
 
             }
         });
+
+        matric.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String SOAP_ACTION="http://tempuri.org/listado_matriculas";
+                final String METHOD_NAME="listado_matriculas";
+
+                dialog=new Dialog(activity_aterrizaje.this);
+                dialog.setContentView(R.layout.dialog_searchable_spinner);
+                dialog.getWindow().setLayout(650,800);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                dialog.show();
+
+                EditText editText = dialog.findViewById(R.id.edit_text);
+                ListView lista_ma = dialog.findViewById(R.id.listado_matricula);
+
+                if (mode==32){
+                    lista_ma.setBackgroundColor(getResources().getColor(R.color.primary_app));
+                }else if (mode==16){
+                    lista_ma.setBackgroundColor(getResources().getColor(R.color.Gris));
+                };
+
+                SoapObject respueta = new SoapObject(NAMESPACES,METHOD_NAME);
+                MarshalDouble md = new MarshalDouble();
+                SoapSerializationEnvelope envelope =new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                md.register(envelope);
+                envelope.dotNet=true;
+                envelope.implicitTypes=true;
+                envelope.encodingStyle=SoapSerializationEnvelope.XSD;
+
+                envelope.setOutputSoapObject(respueta);
+                HttpTransportSE transportSE = new HttpTransportSE(URL);
+                try {
+                    transportSE.call(SOAP_ACTION,envelope);
+                    resultRequestSOAP=(SoapObject)  envelope.getResponse();
+                    final  ArrayList<lista_matriculas> listam = new ArrayList<lista_matriculas>();
+
+                    int noitem = resultRequestSOAP.getPropertyCount();
+                    for (int m=0; m<noitem; m++){
+                        SoapObject lm =(SoapObject) resultRequestSOAP.getProperty(m);
+                        listam.add((new lista_matriculas(Integer.parseInt(lm.getProperty("codigo_matricula").toString()),lm.getProperty("matricula").toString(),lm.getProperty("escliente").toString())));
+                    }
+                    ArrayAdapter<lista_matriculas> lm = new ArrayAdapter<lista_matriculas>(activity_aterrizaje.this, android.R.layout.simple_spinner_dropdown_item,listam);
+                    lista_ma.setAdapter(lm);
+
+                    editText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            lm.getFilter().filter(s);
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+
+                        }
+                    });
+
+                    lista_ma.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            /// String matricula_seleccionada = lm.getItem(position).toString();
+                            lista_matriculas l = (lista_matriculas) lm.getItem(position);
+                            matric.setText(l.toString());
+                            codigo_matricula=l.getCodigomatricula();
+                            matricula=l.toString();
+                            SeleccionOnClick_matricula(view);
+                            dialog.dismiss();
+                        }
+                    });
+                }catch (IOException e){
+                    e.printStackTrace();
+                }catch (XmlPullParserException e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
     limpiarfirma.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -722,9 +812,9 @@ public class activity_aterrizaje extends AppCompatActivity {
         final String SOAP_ACTION="http://tempuri.org/tipo_cliente_matricula";
         final String METHOD_NAME="tipo_cliente_matricula";
 
-        lista_matriculas m=(lista_matriculas) lmatriculas .getSelectedItem();
+        /*lista_matriculas m=(lista_matriculas) lmatriculas .getSelectedItem();
         String matricula_select=m.toString();
-        codigo_matricula = m.getCodigomatricula();
+        codigo_matricula = m.getCodigomatricula();*/
         if (codigo_matricula!=-1){
             SoapObject tipocliente = new SoapObject(NAMESPACES,METHOD_NAME);
             MarshalDouble md = new MarshalDouble();

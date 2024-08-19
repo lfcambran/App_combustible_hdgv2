@@ -23,4 +23,5 @@
     electronico de combustible </string>
     <string name="salir_pantalla">Salindo de la pantalla</string>
     <string name="mensaje_app"></string>
+    <string name="title_activity_temp">temp</string>
 </resources>

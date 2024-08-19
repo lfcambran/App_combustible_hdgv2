@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,8 +22,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.SigningInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -47,6 +51,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -95,16 +100,20 @@ public class activity_emitir_vale extends AppCompatActivity   {
     Button boton_grabar,boton_limpiar,boton_tomar_foto;
     TextView nameuser,existencia,metrot,nombre_producto;
     String uname,codigotransaccion,mensaje_error,nombre_usuario = null,mCurrentPhotoPath,matricula;
-    Spinner listasucursales,lmatriculas,ltanques,tipomovimiento;
-    int codigo_sucursal,codigo_empleado,codigo_tanque_select,codigoproducto;
+    /*Spinner listasucursales,lmatriculas,ltanques,tipomovimiento;*/
+    Spinner listasucursales,ltanques,tipomovimiento;
+    int codigo_sucursal,codigo_empleado,codigo_tanque_select,codigoproducto,mode;
     double existencia_tanque,metro_tanque, longitud,latitud;;
     private ActivityEmitirValeBinding binding;
     private Uri photoURI;
     Bitmap foto_tanque;
     varibles_globales gb;
     ProgressDialog progressDoalog;
+    TextView matric;
 
     ScrollView scrollView;
+
+    Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +142,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         correo_cliente=findViewById(R.id.correo_cliente);
         nameuser=findViewById(R.id.nauser);
         listasucursales=findViewById(R.id.sucursal);
-        lmatriculas=findViewById(R.id.matriculas);
+       /* lmatriculas=findViewById(R.id.matriculas);*/
         ltanques=findViewById(R.id.tanques);
         existencia=findViewById(R.id.existencia);
         metrot=findViewById(R.id.metrotanque);
@@ -144,15 +153,16 @@ public class activity_emitir_vale extends AppCompatActivity   {
         codigo_producto=findViewById(R.id.cproducto);
         codigo_producto.setText(String.valueOf(codigoproducto));
         preciogalon=findViewById(R.id.precio);
+        matric=findViewById(R.id.matricula);
         buscar_nombre_producto(codigoproducto);
         consultar_datos(uname);
-        llenar_matriculas();
+        /*llenar_matriculas();*/
         generar_codigo_transaccion();
         nameuser.setText("Nombre: " + codigo_empleado + " - " + nombre_usuario);
         longitud=gb.getlongitu();
         latitud=gb.getlatitud();
         cantidad_venta.setEnabled(false);
-
+        mode = this.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         if (codigo_sucursal==1 || codigo_sucursal==5 ){
             boton_tomar_foto.setEnabled(false);
         }
@@ -273,7 +283,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
             }
         });
-        lmatriculas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        /*lmatriculas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
              Object i=parent.getItemAtPosition(position);
@@ -287,7 +297,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
-        });
+        });*/
         codigo_producto.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -296,9 +306,9 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String codigoproducto = codigo_producto.getText().toString();
-                if (codigoproducto.length()>0) {
-                    buscar_nombre_producto(Integer.parseInt(codigoproducto));
+                String cproducto = codigo_producto.getText().toString();
+                if (cproducto.length()>0) {
+                    buscar_nombre_producto(Integer.parseInt(cproducto));
                 }
 
             }
@@ -373,13 +383,15 @@ public class activity_emitir_vale extends AppCompatActivity   {
                             cantidad_venta.setSelection(1, 1);
                         }
                     }
-
+                if (!precio.isEmpty()){
                     totalventa=Double.valueOf(cantidad) * Double.valueOf(precio);
                     totalvale.setText(String.valueOf(format.format(totalventa)));
                     mt=metro_tanque+Double.valueOf(cantidad);
                     et=existencia_tanque-Double.valueOf(cantidad);
                     metrot.setText("Metro:" + String.valueOf(format.format(mt)));
                     existencia.setText("Existencia: " + String.valueOf(format.format(et)));
+                }
+
                 } else {
                     cantidad_venta.setText(String.valueOf(0));
                     int c = cantidad_venta .getText().length();
@@ -390,6 +402,89 @@ public class activity_emitir_vale extends AppCompatActivity   {
 
             @Override
             public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        matric.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String SOAP_ACTION="http://tempuri.org/listado_matriculas";
+                final String METHOD_NAME="listado_matriculas";
+
+                dialog=new Dialog(activity_emitir_vale.this);
+                dialog.setContentView(R.layout.dialog_searchable_spinner);
+                dialog.getWindow().setLayout(650,800);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                dialog.show();
+
+                EditText editText = dialog.findViewById(R.id.edit_text);
+                ListView lista_ma = dialog.findViewById(R.id.listado_matricula);
+
+                if (mode==32){
+                    lista_ma.setBackgroundColor(getResources().getColor(R.color.primary_app));
+                }else if (mode==16){
+                    lista_ma.setBackgroundColor(getResources().getColor(R.color.Gris));
+                };
+
+                SoapObject respueta = new SoapObject(NAMESPACES,METHOD_NAME);
+                MarshalDouble md = new MarshalDouble();
+                SoapSerializationEnvelope envelope =new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                md.register(envelope);
+                envelope.dotNet=true;
+                envelope.implicitTypes=true;
+                envelope.encodingStyle=SoapSerializationEnvelope.XSD;
+
+                envelope.setOutputSoapObject(respueta);
+                HttpTransportSE transportSE = new HttpTransportSE(URL);
+                try {
+                    transportSE.call(SOAP_ACTION,envelope);
+                    resultRequestSOAP=(SoapObject)  envelope.getResponse();
+                    final  ArrayList<lista_matriculas> listam = new ArrayList<lista_matriculas>();
+
+                    int noitem = resultRequestSOAP.getPropertyCount();
+                    for (int m=0; m<noitem; m++){
+                        SoapObject lm =(SoapObject) resultRequestSOAP.getProperty(m);
+                        listam.add((new lista_matriculas(Integer.parseInt(lm.getProperty("codigo_matricula").toString()),lm.getProperty("matricula").toString(),lm.getProperty("escliente").toString())));
+                    }
+                    ArrayAdapter<lista_matriculas> lm = new ArrayAdapter<lista_matriculas>(activity_emitir_vale.this, android.R.layout.simple_spinner_dropdown_item,listam);
+                    lista_ma.setAdapter(lm);
+
+                    editText.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            lm.getFilter().filter(s);
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+
+                        }
+                    });
+
+                    lista_ma.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                           /// String matricula_seleccionada = lm.getItem(position).toString();
+                            lista_matriculas l = (lista_matriculas) lm.getItem(position);
+                            matric.setText(l.toString());
+                            codigom=l.getCodigomatricula();
+                            matricula=l.toString();
+                            SeleccionOnClick_matricula(view);
+                            dialog.dismiss();
+                        }
+                    });
+                }catch (IOException e){
+                    e.printStackTrace();
+                }catch (XmlPullParserException e){
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -625,7 +720,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
         float precio;
         mensaje_error="";
         noerror=0;
-        String codigoproducto = codigo_producto.getText().toString();
+        String cp = codigo_producto.getText().toString();
         String nombrepiloto = npiloto.getText().toString();
         String precio_g = preciogalon.getText().toString();
         String cantidad_v = cantidad_venta .getText().toString();
@@ -661,7 +756,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
             }
         }
 
-        if (codigoproducto.length()==0){
+        if (cp.length()==0){
             mensaje_error=mensaje_error + " Debe de Ingresar el codigo del producto" + "\n";
             noerror+=1;
         }
@@ -805,7 +900,9 @@ public class activity_emitir_vale extends AppCompatActivity   {
         e.printStackTrace();
     }
     }
-private void llenar_matriculas(){
+
+    /*
+    private void llenar_matriculas(){
         final String SOAP_ACTION="http://tempuri.org/listado_matriculas";
         final String METHOD_NAME="listado_matriculas";
 
@@ -838,7 +935,7 @@ private void llenar_matriculas(){
         }catch (XmlPullParserException e){
             e.printStackTrace();
         }
-}
+}*/
     public void SeleccionOnclick(View v){
         lista_sucursales sucursales = (lista_sucursales) listasucursales.getSelectedItem();
         Toast.makeText(this, "Seleccion " + sucursales.getCodigo_sucursal() + " " + sucursales.toString(),Toast.LENGTH_LONG).show();
@@ -859,6 +956,7 @@ private void llenar_matriculas(){
         buscar_existencia(codigo_tanque_select);
         buscar_metro(codigo_tanque_select);
         buscar_codigo_producto(codigo_tanque_select);
+
         //buscar metro-existencia
     }
     public void SeleccionOnClick_matricula(View v){
@@ -868,9 +966,9 @@ private void llenar_matriculas(){
 
         final String SOAP_ACTION="http://tempuri.org/tipo_m_matricula";
         final String METHOD_NAME="tipo_m_matricula";
-        lista_matriculas m=(lista_matriculas) lmatriculas.getSelectedItem();
+        /*lista_matriculas m=(lista_matriculas) lmatriculas.getSelectedItem();
         String matricula_sel=m.toString();
-        codigom = m.getCodigomatricula();
+        codigom = m.getCodigomatricula();*/
         SoapObject rtm=new SoapObject(NAMESPACES,METHOD_NAME);
         MarshalDouble md = new MarshalDouble();
         SoapSerializationEnvelope env=new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -878,7 +976,7 @@ private void llenar_matriculas(){
         env.dotNet=true;
         env.implicitTypes=true;
         env.encodingStyle=SoapSerializationEnvelope.XSD;
-        rtm.addProperty("matricula",matricula_sel);
+        rtm.addProperty("matricula",matricula);
         env.setOutputSoapObject(rtm);
         HttpTransportSE transportSE = new HttpTransportSE(URL);
         try {
@@ -964,6 +1062,7 @@ private void llenar_matriculas(){
             t.call(SOAP_ACTION,env);
             rs=(SoapPrimitive) env.getResponse();
             nombre_producto.setText(rs.toString());
+            codigoproducto = codigo;
         }catch (IOException e){
             Toast.makeText(this,"error: " + e.getMessage().toString(),Toast.LENGTH_LONG).show();
         }catch (XmlPullParserException e){
@@ -992,8 +1091,10 @@ private void llenar_matriculas(){
             if (codigo_producto_tanque==0){
                 codigo_producto.setText(String.valueOf(codigoproducto));
                 buscar_nombre_producto(codigoproducto);
+
             } else {
             codigo_producto.setText(String.valueOf(codigo_producto_tanque));
+            codigoproducto=codigo_producto_tanque;
             buscar_nombre_producto(codigo_producto_tanque);
             }
         }catch (IOException e){
