@@ -363,10 +363,44 @@
                     android:id="@+id/correo_cliente"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="5dp"
                     android:hint="(opcional)"
                     android:inputType="textEmailAddress" />
 
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="left"
+                    android:text="Facturar a:"/>
+                <EditText
+                    android:id="@+id/txtfactura_nombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:hint="Facturar a nombre de.."/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Observaciones:"/>
+                <EditText
+                    android:id="@+id/txtobservacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="observaciones"/>
             </LinearLayout>
             <Button
                 android:id="@+id/grabar"

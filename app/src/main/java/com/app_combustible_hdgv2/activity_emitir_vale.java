@@ -98,7 +98,7 @@ public class activity_emitir_vale extends AppCompatActivity   {
     EditText fecha_vale,codigo_producto,preciogalon,totalvale,cantidad_venta,npiloto,correo_cliente;
     DatePickerDialog picker;
     Button boton_grabar,boton_limpiar,boton_tomar_foto;
-    TextView nameuser,existencia,metrot,nombre_producto;
+    TextView nameuser,existencia,metrot,nombre_producto,facturara, observaciones;
     String uname,codigotransaccion,mensaje_error,nombre_usuario = null,mCurrentPhotoPath,matricula;
     /*Spinner listasucursales,lmatriculas,ltanques,tipomovimiento;*/
     Spinner listasucursales,ltanques,tipomovimiento;
@@ -154,6 +154,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
         codigo_producto.setText(String.valueOf(codigoproducto));
         preciogalon=findViewById(R.id.precio);
         matric=findViewById(R.id.matricula);
+        facturara=findViewById(R.id.txtfactura_nombre);
+        observaciones =findViewById(R.id.txtobservacion);
         buscar_nombre_producto(codigoproducto);
         consultar_datos(uname);
         /*llenar_matriculas();*/
@@ -545,7 +547,8 @@ public class activity_emitir_vale extends AppCompatActivity   {
                                 String precio_g = preciogalon.getText().toString();
                                 String cantidad_v = cantidad_venta .getText().toString();
                                 String copia_correo_cliente = correo_cliente.getText().toString();
-
+                                String facturar_nombred = facturara.getText().toString();
+                                String observacion_vale = observaciones.getText().toString();
 
                                 SoapObject respuesta = new SoapObject(NAMESPACES,METHOD_NAME);
                                 MarshalDouble md = new MarshalDouble();
@@ -590,6 +593,20 @@ public class activity_emitir_vale extends AppCompatActivity   {
                                 }else if (copia_correo_cliente.length()==0){
                                     respuesta.addProperty("correo_cliente","Sin Correo");
                                 }
+                                if (observacion_vale.length()>0){
+                                    respuesta.addProperty("observaciones",observacion_vale);
+                                }else{
+                                    respuesta.addProperty("observaciones","Sin Comentarios");
+                                }
+
+                                if (facturar_nombred.length()>0){
+                                    respuesta.addProperty("facturar_a",facturar_nombred);
+                                }else {
+                                    respuesta.addProperty("facturar_a","Mismo Cliente");
+                                }
+
+
+
                                 envelope.setOutputSoapObject(respuesta);
 
                                 HttpTransportSE transportSE = new HttpTransportSE(URL);
