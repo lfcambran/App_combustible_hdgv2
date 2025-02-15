@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -162,15 +163,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createNotification() {
+        Intent intent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent=PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Action action=new NotificationCompat.Action.Builder(R.drawable.iconapp,"APP HDGC",pendingIntent).build();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
-        builder.setSmallIcon(R.drawable.iconapp);
-        builder.setContentTitle("Aplicacion Combustible");
-        builder.setContentText("Venta y Consumo de Combustible HDG");
-        builder.setColor(Color.BLUE);
-        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        builder.setLights(Color.MAGENTA, 1000, 1000);
-        builder.setVibrate(new long[]{1000, 1000, 1000, 100, 1000});
-        builder.setDefaults(Notification.DEFAULT_SOUND);
+        builder.setAutoCancel(true)
+                        .addAction(action)
+                        .setSmallIcon(R.drawable.iconapp)
+                        .setContentTitle("Aplicacion Combustible")
+                        .setContentText("Venta y Consumo de Combustible HDG")
+                        .setColor(Color.BLUE)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setLights(Color.MAGENTA, 1000, 1000)
+                        .setVibrate(new long[]{1000, 1000, 1000, 100, 1000})
+                        .setDefaults(Notification.DEFAULT_SOUND);
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
 
@@ -186,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         }
         notificationManagerCompat.notify(NOTIFICACION_ID, builder.build());
     }
+
 
     private  void consultar_notificaciones(){
         final String SOAP_ACTION ="http://tempuri.org/consultar_notificacion";
