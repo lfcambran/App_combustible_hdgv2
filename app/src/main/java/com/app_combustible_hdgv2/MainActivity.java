@@ -17,6 +17,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -43,6 +44,9 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
+
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
     TextView tusuario;
     String uname,nombrecompleto;
     private SoapObject resultRequestSOAP = null;
@@ -56,13 +60,26 @@ public class MainActivity extends AppCompatActivity {
     final String URL = "http://200.30.144.133:3427/wsite_c/wsb_combustible_hdg/ws_datos_combustible.asmx";
     final String NAMESPACES = "http://tempuri.org/";
     private varibles_globales ug;
+    String clave_user = "";
+    String usuario_i = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        uname = getIntent().getStringExtra("nombre_usuario");
         tusuario = findViewById(R.id.tnousuario);
+        preferences = this.getPreferences(Context.MODE_PRIVATE);
+
+        editor=preferences.edit();
+        usuario_i=this.preferences.getString(clave_user,"");
+        uname = getIntent().getStringExtra("nombre_usuario");
+
+        if (uname==null){
+            uname=usuario_i;
+            Toast.makeText(getApplicationContext(), usuario_i, Toast.LENGTH_LONG).show();
+        }else{
+            usuarioIniciado(uname);
+        }
         tusuario.setText("Usuario: " + uname);
 
         opciones=findViewById(R.id.nueva_opcion);
@@ -78,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 opciones.setVisibility(View.GONE);
             };
         setTitle("Principal-" + nombrecompleto);
+
     }
 
     public void cerrar_session(View view) {
@@ -263,6 +281,10 @@ public class MainActivity extends AppCompatActivity {
         }catch (XmlPullParserException e){
             e.printStackTrace();
         }
+    }
+    private void usuarioIniciado(String usuario){
+        editor.putString(clave_user,usuario);
+        editor.apply();
     }
 
 }
